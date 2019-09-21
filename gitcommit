@@ -22,6 +22,7 @@
 # * Live update on current line length on subject? Use colour?
 # * Add quick select options (e.g. types)
 # * Add autocomplete as typing
+# * Add support for parameter passthrough from the command line
 # 
 
 from __future__ import print_function
