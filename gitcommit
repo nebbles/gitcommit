@@ -1,0 +1,142 @@
+#!/usr/bin/env python
+#
+# This script implements Conventional Commit v1.0.0-beta.4
+# 
+# TEMPLATE:
+#
+# <type>[optional scope]: <description>
+#
+# [BREAKING CHANGE: ][optional body / required if breaking change]
+#
+# [optional footer]
+#
+# ADDITIONAL RULES:
+# - Subject line (i.e. top) should be no more than 50 characters.
+# - Every other line should be no more than 72 characters.
+# - Wrapping is allowed in the body and footer, NOT in the subject.
+#
+# TODO list
+# * Support line length
+# * Support for field hints/explanations
+# * Add text colour for clearer UI feedback
+# * Live update on current line length on subject? Use colour?
+# * Add quick select options (e.g. types)
+# * Add autocomplete as typing
+# 
+
+from __future__ import print_function
+from builtins import input
+import sys
+import subprocess
+import textwrap
+
+def add_type(commit_msg):
+    valid_types = ["fix", "feat", "chore", "docs",
+                   "style", "refactor", "perf", "test", "improvement"]
+    c_type = ""
+    while c_type not in valid_types:
+        print("Acceptable types: ", valid_types)
+        c_type = input("Type: ")
+        if c_type not in valid_types:
+            print("That is not an accepted commit 'type'.")
+    
+    commit_msg += c_type
+    return commit_msg
+
+def add_scope(commit_msg):
+    c_scope = input("Scope (optional): ")
+
+    if c_scope != "":
+        commit_msg += "({})".format(c_scope)
+    
+    return commit_msg
+
+def add_description(commit_msg):
+    commit_msg += ": "
+    num_chars_remaining = 50 - len(commit_msg)
+    c_descr = ""
+    while c_descr == "":
+        c_descr = input("Description: ")
+        if c_descr == "":
+            print("You must write a description.")
+        if len(c_descr) > num_chars_remaining:
+            print("Your description is too long! ({} characters)".format(len(c_descr)))
+            print("You only have {} characters available.".format(num_chars_remaining))
+            c_descr = "" # reset string
+
+    commit_msg += c_descr
+    return commit_msg
+
+def add_body(commit_msg):
+    c_breaking_change = False
+    contains_break = ""
+    while contains_break not in ["y", "n"]:
+        contains_break = input("Does commit contain breaking change? [y/n]")
+        if contains_break not in ["y", "n"]:
+            print("Answer 'y' or 'n'")
+            continue
+        elif contains_break == "y":
+            c_breaking_change = True
+
+    if c_breaking_change:
+        c_body = ""
+        while c_body == "":
+            c_body = input("Body (required): ")
+    else:
+        c_body = input("Body (optional): ")
+
+    full_body = ""
+    if c_breaking_change:
+        full_body = "BREAKING CHANGE: " + c_body
+    elif c_body != "":
+        full_body = c_body
+
+    full_body = "\n".join(textwrap.wrap(full_body, width=72, break_long_words=False))
+
+    commit_msg += "\n\n" + full_body
+    return commit_msg
+
+def add_footer(commit_msg):
+    c_footer = input("Footer (optional): ")
+    if c_footer != "":
+        formatted_footer = "\n".join(textwrap.wrap(
+            c_footer, width=72, break_long_words=False))
+        commit_msg += "\n\n" + formatted_footer
+    
+    return commit_msg
+    
+
+def main():
+    print(sys.version + "/n")
+
+    print("Starting a conventional git commit...")
+
+    commit_msg = ""
+    commit_msg = add_type(commit_msg)
+    commit_msg = add_scope(commit_msg)
+    commit_msg = add_description(commit_msg)
+    commit_msg = add_body(commit_msg)
+    commit_msg = add_footer(commit_msg)
+    
+    print("This is your commit message:\n")
+    print(commit_msg)
+
+    # print("\nNOTE: This was a dry run and no commit was made.\n")
+    
+    confirm = ""
+    while confirm not in ["y", "n"]:
+        confirm = input("Do you want to make your commit? [y/n]")
+        if confirm == "y":
+            print()
+            subprocess.call(['git', 'status'])
+        elif confirm == "n":
+            print("Aborting the commit.")
+            return
+
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nAborted.")
