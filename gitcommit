@@ -16,7 +16,6 @@
 # - Wrapping is allowed in the body and footer, NOT in the subject.
 #
 # TODO list
-# * Support line length
 # * Support for field hints/explanations
 # * Add text colour for clearer UI feedback
 # * Live update on current line length on subject? Use colour?
@@ -129,7 +128,7 @@ def main():
         confirm = input("Do you want to make your commit? [y/n]")
         if confirm == "y":
             print()
-            subprocess.call(['git', 'status'])
+            subprocess.call(['git', 'commit', '-m', commit_msg])
         elif confirm == "n":
             print("Aborting the commit.")
             return
