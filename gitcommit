@@ -206,7 +206,8 @@ def add_body(commit_msg):
     full_body = "\n".join(textwrap.wrap(
         full_body, width=72, break_long_words=False))
 
-    commit_msg += "\n\n" + full_body
+    if full_body != "":
+        commit_msg += "\n\n" + full_body
     return commit_msg
 
 
