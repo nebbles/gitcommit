@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 #
-# This script implements Conventional Commit v1.0.0-beta.4
+# gitcommit: a tool for writing conventional commits, conveniently
+# Author: Ben Greenberg
+# Created: 20th September 2019
+#
+# Implements Conventional Commit v1.0.0-beta.4
 #
 # TEMPLATE:
 #
-# <type>[optional scope]: <description>
+# <type>[(optional scope)]: <description>
 #
 # [BREAKING CHANGE: ][optional body / required if breaking change]
 #
@@ -15,13 +19,11 @@
 # - Every other line should be no more than 72 characters.
 # - Wrapping is allowed in the body and footer, NOT in the subject.
 #
-# TODO list
-# * Support for field hints/explanations
-# * Add text colour for clearer UI feedback
-# * Live update on current line length on subject? Use colour?
-# * Add quick select options (e.g. types)
-# * Add autocomplete as typing
-# * Add support for parameter passthrough from the command line
+# TODO LIST:
+# * Live update (with colour?) on current line length on for subject.
+# * More information on types; possible quick select? e.g. (f) fix
+# * Improved keyboard input method (support for arrow keys, enter for new line)
+# * Add support for git commit parameter passthrough from the command line
 #
 
 from __future__ import print_function
@@ -257,18 +259,18 @@ def main():
         Ansi.print_warning(
             "Do you want to make your commit? [y/n] ", end='')
         confirm = input().lower()
-        
+
         if confirm == "y":
             print()
             subprocess.call(['git', 'commit', '-m', commit_msg])
-            Ansi.print_ok("\nCommit has been made to conventional commits standards!")
+            Ansi.print_ok(
+                "\nCommit has been made to conventional commits standards!")
         elif confirm == "n":
             print("Aborting the commit.")
             return
         else:
             Ansi.print_error("Answer must be 'y' or 'n'")
             continue
-
 
 
 if __name__ == "__main__":
