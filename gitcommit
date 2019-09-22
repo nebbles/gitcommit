@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # This script implements Conventional Commit v1.0.0-beta.4
-# 
+#
 # TEMPLATE:
 #
 # <type>[optional scope]: <description>
@@ -22,7 +22,7 @@
 # * Add quick select options (e.g. types)
 # * Add autocomplete as typing
 # * Add support for parameter passthrough from the command line
-# 
+#
 
 from __future__ import print_function
 from builtins import input
@@ -30,60 +30,172 @@ import sys
 import subprocess
 import textwrap
 
+
+class Ansi:
+    """
+    This class contains the ANSI escape codes for printing to the console as
+    well as commonly used combinations of these codes.
+    """
+
+    reset = "\033[0m"
+    bold = "\033[1m"
+    faint = "\033[2m"
+    italic = "\033[3m"
+    underline = "\033[4m"
+    blink = "\033[5m"
+    inverse = "\033[7m"
+
+    class fg:
+        black = "\033[30m"
+        red = "\033[31m"
+        green = "\033[32m"
+        yellow = "\033[33m"
+        blue = "\033[34m"
+        magenta = "\033[35m"
+        cyan = "\033[36m"
+        white = "\033[37m"
+
+        grey = "\033[90m"
+        bright_red = "\033[91m"
+        bright_green = "\033[92m"
+        bright_yellow = "\033[93m"
+        bright_blue = "\033[94m"
+        bright_magenta = "\033[95m"
+        bright_cyan = "\033[96m"
+        bright_white = "\033[97m"
+
+    class bg:
+        black = "\033[40m"
+        red = "\033[41m"
+        green = "\033[42m"
+        yellow = "\033[43m"
+        blue = "\033[44m"
+        magenta = "\033[45m"
+        cyan = "\033[46m"
+        white = "\033[47m"
+
+        grey = "\033[100m"
+        bright_red = "\033[101m"
+        bright_green = "\033[102m"
+        bright_yellow = "\033[103m"
+        bright_blue = "\033[104m"
+        bright_magenta = "\033[105m"
+        bright_cyan = "\033[106m"
+        bright_white = "\033[107m"
+
+    @classmethod
+    def b_green(cls, content):
+        return cls.fg.bright_green + cls.bold + str(content) + cls.reset
+
+    @classmethod
+    def b_red(cls, content):
+        return cls.fg.bright_red + cls.bold + str(content) + cls.reset
+
+    @classmethod
+    def b_yellow(cls, content):
+        return cls.fg.bright_yellow + cls.bold + str(content) + cls.reset
+
+    @classmethod
+    def b_blue(cls, content):
+        return cls.fg.bright_blue + cls.bold + str(content) + cls.reset
+
+    @classmethod
+    def print_ok(cls, content, end='\n'):
+        print(cls.b_green(content), end=end)
+
+    @classmethod
+    def print_error(cls, content, end='\n'):
+        print(cls.b_red(content), end=end)
+
+    @classmethod
+    def print_warning(cls, content, end='\n'):
+        print(cls.b_yellow(content), end=end)
+
+    @classmethod
+    def print_info(cls, content, end='\n'):
+        print(cls.b_blue(content), end=end)
+
+
 def add_type(commit_msg):
     valid_types = ["fix", "feat", "chore", "docs",
                    "style", "refactor", "perf", "test", "improvement"]
+    Ansi.print_info(
+        "\nPlease specify the type of this commit using one of the available keywords.")
+    Ansi.print_info("Accepted types: ", end='')
+    Ansi.print_warning(valid_types)
     c_type = ""
     while c_type not in valid_types:
-        print("Acceptable types: ", valid_types)
-        c_type = input("Type: ")
+
+        Ansi.print_ok("Type: ", end='')
+        c_type = input()
         if c_type not in valid_types:
-            print("That is not an accepted commit 'type'.")
-    
+            Ansi.print_error("That is not an accepted commit 'type'.")
+
     commit_msg += c_type
     return commit_msg
 
+
 def add_scope(commit_msg):
-    c_scope = input("Scope (optional): ")
+    Ansi.print_info("\nWhat is the scope of this commit?")
+    Ansi.print_ok("Scope (optional): ", end='')
+    c_scope = input()
 
     if c_scope != "":
         commit_msg += "({})".format(c_scope)
-    
+
     return commit_msg
+
 
 def add_description(commit_msg):
     commit_msg += ": "
     num_chars_remaining = 50 - len(commit_msg)
+    Ansi.print_info("\nWhat is the commit description (i.e. title). The description is a short summary of the code changes. Note that this must be no more than {} characters.".format(
+        num_chars_remaining))
     c_descr = ""
     while c_descr == "":
-        c_descr = input("Description: ")
+        Ansi.print_ok("Description: ", end='')
+        c_descr = input()
         if c_descr == "":
-            print("You must write a description.")
+            Ansi.print_error("You must write a description.")
         if len(c_descr) > num_chars_remaining:
-            print("Your description is too long! ({} characters)".format(len(c_descr)))
-            print("You only have {} characters available.".format(num_chars_remaining))
-            c_descr = "" # reset string
+            Ansi.print_error(
+                "Your description is too long! ({} characters)".format(len(c_descr)))
+            Ansi.print_error(
+                "You only have {} characters available.".format(num_chars_remaining))
+            c_descr = ""  # reset string
 
     commit_msg += c_descr
     return commit_msg
 
+
 def add_body(commit_msg):
     c_breaking_change = False
     contains_break = ""
+    print()  # breakline from previous section
     while contains_break not in ["y", "n"]:
-        contains_break = input("Does commit contain breaking change? [y/n]")
+        Ansi.print_warning(
+            "Does commit contain breaking change? [y/n] ", end='')
+        contains_break = input().lower()
         if contains_break not in ["y", "n"]:
-            print("Answer 'y' or 'n'")
+            Ansi.print_error("Answer must be 'y' or 'n'")
             continue
         elif contains_break == "y":
             c_breaking_change = True
 
     if c_breaking_change:
+        Ansi.print_info(
+            "\nPlease explain what has changed in this commit to cause breaking changes.")
         c_body = ""
         while c_body == "":
-            c_body = input("Body (required): ")
+            Ansi.print_ok("Body (required): ", end='')
+            c_body = input()
+            if c_body == "":
+                Ansi.print_error("You must explain your breaking changes.")
     else:
-        c_body = input("Body (optional): ")
+        Ansi.print_info(
+            "\nYou may provide additional contextual information about the code changes here.")
+        Ansi.print_ok("Body (optional): ", end='')
+        c_body = input()
 
     full_body = ""
     if c_breaking_change:
@@ -96,20 +208,23 @@ def add_body(commit_msg):
     commit_msg += "\n\n" + full_body
     return commit_msg
 
+
 def add_footer(commit_msg):
-    c_footer = input("Footer (optional): ")
+    Ansi.print_info("\nThe footer MUST contain meta-information about the commit, e.g., related pull-requests, reviewers, breaking changes, with one piece of meta-information per-line. To enter a new line, use the \\ character, NOT the 'Enter' key.'")
+    Ansi.print_ok("Footer (optional): ", end='')
+    c_footer = input()
     if c_footer != "":
         formatted_footer = "\n".join(textwrap.wrap(
             c_footer, width=72, break_long_words=False))
         commit_msg += "\n\n" + formatted_footer
-    
+
     return commit_msg
-    
+
 
 def main():
-    print(sys.version + "/n")
+    # print(sys.version + "/n")
 
-    print("Starting a conventional git commit...")
+    Ansi.print_ok("Starting a conventional git commit...")
 
     commit_msg = ""
     commit_msg = add_type(commit_msg)
@@ -117,21 +232,30 @@ def main():
     commit_msg = add_description(commit_msg)
     commit_msg = add_body(commit_msg)
     commit_msg = add_footer(commit_msg)
-    
-    print("This is your commit message:\n")
+
+    Ansi.print_ok("\nThis is your commit message:")
+    print()
     print(commit_msg)
+    print()
 
     # print("\nNOTE: This was a dry run and no commit was made.\n")
-    
+
     confirm = ""
     while confirm not in ["y", "n"]:
-        confirm = input("Do you want to make your commit? [y/n]")
+        Ansi.print_warning(
+            "Do you want to make your commit? [y/n] ", end='')
+        confirm = input().lower()
+        
         if confirm == "y":
             print()
             subprocess.call(['git', 'commit', '-m', commit_msg])
+            Ansi.print_ok("\nCommit has been made to conventional commits standards!")
         elif confirm == "n":
             print("Aborting the commit.")
             return
+        else:
+            Ansi.print_error("Answer must be 'y' or 'n'")
+            continue
 
 
 
