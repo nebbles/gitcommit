@@ -216,8 +216,18 @@ def add_footer(commit_msg):
     Ansi.print_ok("Footer (optional): ", end='')
     c_footer = input()
     if c_footer != "":
-        formatted_footer = "\n".join(textwrap.wrap(
-            c_footer, width=72, break_long_words=False))
+
+        # divide by user defined line breaks
+        footer_lines = c_footer.split("\\")
+        for i, line in enumerate(footer_lines):
+            line = line.strip()  # clean up extraneous whitespace
+
+            # format each user line with forced line breaks to maintain maximum line length
+            footer_lines[i] = "\n".join(textwrap.wrap(
+                line, width=72, break_long_words=False, subsequent_indent="  "))
+
+        # recombine all user defined footer lines
+        formatted_footer = "\n".join(footer_lines)
         commit_msg += "\n\n" + formatted_footer
 
     return commit_msg
