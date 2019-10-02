@@ -296,20 +296,33 @@ def main():
 
     # print("\nNOTE: This was a dry run and no commit was made.\n")
 
-    confirm = ""
-    while confirm not in ["y", "n"]:
+    argv_passthrough = [] # by default add no extra arguments
+
+    while True:
+        # Warn of extra command line arguments
+        if len(sys.argv) > 1:
+            Ansi.print_warning(
+                "The following additional arguments will be passed to git commit: ", end='')
+            Ansi.print_warning(sys.argv[1:])
+            argv_passthrough = sys.argv[1:] # overwrite default list
+
+        # Ask for confirmation to commit
         Ansi.print_warning(
             "Do you want to make your commit? [y/n] ", end='')
         confirm = input().lower()
 
         if confirm == "y":
             print()
-            subprocess.call(['git', 'commit', '-m', commit_msg])
+            cmds = ['git', 'commit', '-m', commit_msg] + argv_passthrough
+            subprocess.call(cmds)
             Ansi.print_ok(
                 "\nCommit has been made to conventional commits standards!")
+            return
+        
         elif confirm == "n":
             print("Aborting the commit.")
             return
+        
         else:
             Ansi.print_error("Answer must be 'y' or 'n'")
             continue
