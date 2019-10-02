@@ -164,7 +164,7 @@ def check_if_breaking_change():
 
 
 def add_description(commit_msg):
-    if IS_BREAKING_CHANGE is not None:
+    if IS_BREAKING_CHANGE is None:
         raise ValueError(
             "Global variable `IS_BREAKING_CHANGE` has not been set.")
 
@@ -194,7 +194,7 @@ def add_description(commit_msg):
 
 
 def add_body(commit_msg):
-    if IS_BREAKING_CHANGE is not None:
+    if IS_BREAKING_CHANGE is None:
         raise ValueError(
             "Global variable `IS_BREAKING_CHANGE` has not been set.")
 
