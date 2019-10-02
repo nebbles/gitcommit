@@ -115,19 +115,46 @@ class Ansi:
 
 
 def add_type(commit_msg):
-    valid_types = ["feat", "fix", "chore", "docs",
-                   "perf", "refactor", "revert", "style", "test", "wip"]
-    Ansi.print_info(
-        "\nPlease specify the type of this commit using one of the available keywords.")
-    Ansi.print_info("Accepted types: ", end='')
-    Ansi.print_warning(valid_types)
-    c_type = ""
-    while c_type not in valid_types:
+    valid_types = {
+        "feat": "MUST be used the commit adds/builds toward a new feature",
+        "fix": "MUST be used when a commit represents a bug fix",
+        "chore": "Any change to build system, dependencies, config files, scripts (no production code)",
+        "docs": "Changes to documentation",
+        "perf": "Changes that improves performance",
+        "refactor": "Refactoring production code, e.g. renaming a variable/restructuring existing logic",
+        "revert": "Any commit that explicitly reverts part/all changes introduced in a previous commit",
+        "style": "Changes to white-space, formatting, missing semi-colons, etc.",
+        "test": "Changes to tests e.g. adding a new/missing test or fixing/correcting existing tests",
+        "wip": "Any code changes that are work in progress; they may not build (use these sparingly!)"
+    }
 
+    Ansi.print_info("Please specify the type of this commit using one of the available keywords. Accepted types: ")
+
+    type_names = sorted(valid_types.keys())
+    prefixes = ["    "+str(i)+"  "+t for i, t in enumerate(type_names)]
+    prefix_length = max([len(p) for p in prefixes])+2
+    
+    for i in range(len(type_names)):
+        # Combine type name with type description
+        type_print = prefixes[i].ljust(prefix_length) + valid_types[type_names[i]]
+        # Wrap type name+description to maximum line length
+        # type_print = "\n".join(textwrap.wrap(type_print, width=72, break_long_words=False, subsequent_indent=" "*prefix_length))
+        # Print the type
+        Ansi.print_warning(type_print)
+
+    print()
+    while True:
         Ansi.print_ok("Type: ", end='')
         c_type = input()
-        if c_type not in valid_types:
+        if c_type in valid_types.keys():
+            break
+        elif c_type in [str(n) for n in range(len(type_names))]:
+            # Convert from number back to proper type name
+            c_type = type_names[int(c_type)]
+            break
+        else:
             Ansi.print_error("That is not an accepted commit 'type'.")
+            continue
 
     commit_msg += c_type
     return commit_msg
