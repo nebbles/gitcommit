@@ -115,8 +115,8 @@ class Ansi:
 
 
 def add_type(commit_msg):
-    valid_types = ["fix", "feat", "chore", "docs",
-                   "style", "refactor", "perf", "test", "improvement"]
+    valid_types = ["feat", "fix", "chore", "docs",
+                   "perf", "refactor", "revert", "style", "test", "wip"]
     Ansi.print_info(
         "\nPlease specify the type of this commit using one of the available keywords.")
     Ansi.print_info("Accepted types: ", end='')
