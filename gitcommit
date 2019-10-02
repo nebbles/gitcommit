@@ -26,6 +26,8 @@ import sys
 import subprocess
 import textwrap
 
+IS_BREAKING_CHANGE = None  # default for global variable
+
 
 class Ansi:
     """
@@ -142,8 +144,35 @@ def add_scope(commit_msg):
     return commit_msg
 
 
+def check_if_breaking_change():
+    global IS_BREAKING_CHANGE  # required to be able to write to variable
+    contains_break = ""
+    print()  # breakline from previous section
+    while True:
+        Ansi.print_warning(
+            "Does commit contain breaking change? [y/n] ", end='')
+        contains_break = input().lower()
+        if contains_break not in ["y", "n"]:
+            Ansi.print_error("Answer must be 'y' or 'n'")
+            continue
+        elif contains_break == "y":
+            IS_BREAKING_CHANGE = True
+            return True
+        else:
+            IS_BREAKING_CHANGE = False
+            return False
+
+
 def add_description(commit_msg):
-    commit_msg += ": "
+    if IS_BREAKING_CHANGE is not None:
+        raise ValueError(
+            "Global variable `IS_BREAKING_CHANGE` has not been set.")
+
+    if IS_BREAKING_CHANGE:
+        commit_msg += "!: "
+    else:
+        commit_msg += ": "
+
     num_chars_remaining = 50 - len(commit_msg)
     Ansi.print_info("\nWhat is the commit description (i.e. title). The description is a short summary of the code changes. Note that this must be no more than {} characters.".format(
         num_chars_remaining))
@@ -165,20 +194,11 @@ def add_description(commit_msg):
 
 
 def add_body(commit_msg):
-    c_breaking_change = False
-    contains_break = ""
-    print()  # breakline from previous section
-    while contains_break not in ["y", "n"]:
-        Ansi.print_warning(
-            "Does commit contain breaking change? [y/n] ", end='')
-        contains_break = input().lower()
-        if contains_break not in ["y", "n"]:
-            Ansi.print_error("Answer must be 'y' or 'n'")
-            continue
-        elif contains_break == "y":
-            c_breaking_change = True
+    if IS_BREAKING_CHANGE is not None:
+        raise ValueError(
+            "Global variable `IS_BREAKING_CHANGE` has not been set.")
 
-    if c_breaking_change:
+    if IS_BREAKING_CHANGE:
         Ansi.print_info(
             "\nPlease explain what has changed in this commit to cause breaking changes.")
         c_body = ""
@@ -194,7 +214,7 @@ def add_body(commit_msg):
         c_body = input()
 
     full_body = ""
-    if c_breaking_change:
+    if IS_BREAKING_CHANGE:
         full_body = "BREAKING CHANGE: " + c_body
     elif c_body != "":
         full_body = c_body
@@ -237,6 +257,7 @@ def main():
     commit_msg = ""
     commit_msg = add_type(commit_msg)
     commit_msg = add_scope(commit_msg)
+    check_if_breaking_change()
     commit_msg = add_description(commit_msg)
     commit_msg = add_body(commit_msg)
     commit_msg = add_footer(commit_msg)
