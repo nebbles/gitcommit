@@ -19,12 +19,6 @@
 # - Every other line should be no more than 72 characters.
 # - Wrapping is allowed in the body and footer, NOT in the subject.
 #
-# TODO LIST:
-# * Live update (with colour?) on current line length on for subject.
-# * More information on types; possible quick select? e.g. (f) fix
-# * Improved keyboard input method (support for arrow keys, enter for new line)
-# * Add support for git commit parameter passthrough from the command line
-#
 
 from __future__ import print_function
 from builtins import input
