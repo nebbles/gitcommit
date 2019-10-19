@@ -4,6 +4,7 @@
   <code>a tool for writing conventional commits, conveniently</code>
   <br><br>
   <a href="https://badge.fury.io/py/conventional-commit"><img src="https://badge.fury.io/py/conventional-commit.svg" alt="PyPI version" height="18"></a>
+  <a href="https://travis-ci.org/nebbles/gitcommit/branches"><img src="https://travis-ci.org/nebbles/gitcommit.svg?branch=master" alt="Travis CI build" height="18"></a>
 </p>
 
 # Install
@@ -41,4 +42,60 @@ Additional rules implemeted:
 
 # Development
 
-For development, see the developer readme file: [README.dev.md](./README.dev.md)
+The old distribution method is documented in 
+[docs/dev_distibution_legacy.md](docs/dev_distribution_legacy.md)
+
+*Note: if modifying `.travis.yml` you should verify it by running `travis lint .travis.yml`*
+
+## Getting started
+
+1. Make sure you have [Poetry](https://github.com/sdispater/poetry) installed.
+
+1. Make sure you have [pyenv](https://github.com/pyenv/pyenv) installed.
+
+1. Git clone.
+
+1. It is highly recommend you enable setting for storing the venvs within your projects.
+   ```
+   poetry config settings.virtualenvs.in-project true
+   ```
+
+1. Install project dependencies.
+    ```
+    poetry install
+    ```
+
+## Running the package locally
+
+1. Activate the virtual environment.
+    ```
+    source .venv/bin/activate
+    ```
+
+1. Run the package as a module.
+    ```
+    python -m gitcommit
+    ```
+
+## Deploy
+
+Deployment is handled automatically by Travis CI. It has been linked to the
+repository and is automatically watching for pushes to master. It will build and
+test every commit to master. It will also build every tagged commit as if it was
+a branch, and since its a tagged commit, will attempt to publish it to PyPI.
+
+1. Don't forget to increment version number set in `pyproject.toml`. This can be
+   done with poetry.
+   ```
+   poetry version [patch|minor|major]
+   ```
+
+1. Tag the commit (by default applies to HEAD commit).
+   ```
+   git tag v#.#.#
+   ```
+
+1. When pushing commits to remote, you must explicitly push tags too.
+   ```
+   git push origin --tags
+   ```
