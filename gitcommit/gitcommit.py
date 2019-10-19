@@ -278,7 +278,7 @@ def add_footer(commit_msg):
     return commit_msg
 
 
-def main():
+def run():
     # print(sys.version + "/n")
 
     Ansi.print_ok("Starting a conventional git commit...")
@@ -328,3 +328,10 @@ def main():
         else:
             Ansi.print_error("Answer must be 'y' or 'n'")
             continue
+
+
+def main():
+    try:
+        run()
+    except KeyboardInterrupt:
+        print("\nAborted.")
