@@ -128,15 +128,17 @@ def add_type(commit_msg):
         "wip": "Any code changes that are work in progress; they may not build (use these sparingly!)"
     }
 
-    Ansi.print_info("Please specify the type of this commit using one of the available keywords. Accepted types: ")
+    Ansi.print_info(
+        "Please specify the type of this commit using one of the available keywords. Accepted types: ")
 
     type_names = sorted(valid_types.keys())
     prefixes = ["    "+str(i)+"  "+t for i, t in enumerate(type_names)]
     prefix_length = max([len(p) for p in prefixes])+2
-    
+
     for i in range(len(type_names)):
         # Combine type name with type description
-        type_print = prefixes[i].ljust(prefix_length) + valid_types[type_names[i]]
+        type_print = prefixes[i].ljust(prefix_length) \
+            + valid_types[type_names[i]]
         # Wrap type name+description to maximum line length
         # type_print = "\n".join(textwrap.wrap(type_print, width=72, break_long_words=False, subsequent_indent=" "*prefix_length))
         # Print the type
@@ -296,7 +298,7 @@ def main():
 
     # print("\nNOTE: This was a dry run and no commit was made.\n")
 
-    argv_passthrough = [] # by default add no extra arguments
+    argv_passthrough = []  # by default add no extra arguments
 
     while True:
         # Warn of extra command line arguments
@@ -304,7 +306,7 @@ def main():
             Ansi.print_warning(
                 "The following additional arguments will be passed to git commit: ", end='')
             Ansi.print_warning(sys.argv[1:])
-            argv_passthrough = sys.argv[1:] # overwrite default list
+            argv_passthrough = sys.argv[1:]  # overwrite default list
 
         # Ask for confirmation to commit
         Ansi.print_warning(
@@ -318,18 +320,11 @@ def main():
             Ansi.print_ok(
                 "\nCommit has been made to conventional commits standards!")
             return
-        
+
         elif confirm == "n":
             print("Aborting the commit.")
             return
-        
+
         else:
             Ansi.print_error("Answer must be 'y' or 'n'")
             continue
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\nAborted.")
