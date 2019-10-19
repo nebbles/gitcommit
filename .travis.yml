@@ -12,7 +12,8 @@ before_install:
 - pip install poetry
 install:
 - poetry install
-# script:
+script:
+- echo Skipping tests
 # - poetry run flake8 my_package test
 # - poetry run coverage run --source=my_package -m unittest discover -b
 before_deploy:
