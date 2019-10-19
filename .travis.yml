@@ -1,0 +1,26 @@
+# This config was created with the help of https://github.com/sdispater/poetry/issues/366
+language: python
+python:
+- 3.7
+env:
+  global:
+  # Command to generate secure variables: travis encrypt VARIABLE=VALUE --add env.global
+  # As described in: https://docs.travis-ci.com/user/environment-variables/#encrypting-environment-variables
+  - secure: CCzusz6iFvt6Vi4kZphyommuScxfgh4xGlwWNpqLDxM3MwlNAexsT49cilkQJUProhWUy1ekpz65mpA2mecXjMBQSUBgVOobeWtj6hZSv7oVV7LLEy5e3P6x6+4Hb157e0uvlTVvNRS8OAN2cfv3IU9Hf2VoQ3csbZcnODYe//oxK1ydU5P66e4IvizD8/3zFfrMn+xRNdoVcqmD8LGNMT4icSXRoi1c2sAHHpJkVfLPoyFgpw7h+d0rqfHGz5zkEjlVzqMLMjZwbfmFkRkd6HB1HHOd49b1YRJEY3dcVCzVIgwPymD6q5YAFVhBtJAHewOrhn1ry2ENHR9vg/aRVIv+bNfxzoYdf0uiA+CH8eu0Bv1kou8wD3uw0n49CLdSM2conLh2Oax2lWRzzbXFIDKDe/P3KCmaEdh65viQQhexdBGC4Uwfdompl4W6k1K1IEPNWiR8f8sGymWVwiAFDvQaVABnlikrCwS3NkZPJp5V6hHep3pwfLinsVOpg0xa0XyrKpqo1l4z1F7aqIY5hWf71QS99YTBQgbsgNMv6TWJSMD65jdOhFE/u/T4SuwmphMtzDrXcKXQOnaw/4qF6N5CRS3A1KtnYRc1bE1buSvDa9F7578+KlYvlDjJvE09b/PEX9vWVX0Rs9XetIm7U/sNJ0Xf2V+D6nc84HzVBOU=
+  - secure: SuLuw/q+nnHTShYI+7ZEW02SWeWUlV2aJzwiR/H/Xa5HXqu5PhRYam4V7XfnZgl5wFS1PEbkCmFmz2vht7SoZQG0t77EnI/6aX5RyKSDTOyNqGJJFAQCeZVpyjbhDb5aG8b6N4VfF++ADozM6DNaJ5KgSC6pLqy2HYIQoxIhC1bYayWwAq+wNuz3n354H6ko+QuSDELTlpQKeq3ozOlIqfyakrSRtHF5ZjuT10tQKvCjKw1Tvbmg77ek5XFjBG0LuL9tAW8jr94NwoC3bKE8xgAmShGBy/71vKLFzTorKN2F1tM4p3WgsktJgKpoK0d335b6stZLRLcgQzAw+aiCydUQkQZqKLfJCUkbQmnLRFhiNj7tbSarkkstIYBh9eVcT1jHjyJmbfXTIB9UkFcp8NcZFrs1k0QrpEFzoGmNfsGQI/pOYDkBDsNLIZ7zDlqKqQXDzgGYQfdiMnX3pkQaZZzBJ3R1Fws+w0jpgjTfVV3IXTZf7u5/qgogtSTS65bXKFNHSvwNWbguTuDlFq1Ov8bbdynxAoRO78F+s3F51wAbmdpTWvBnQa4+ZnlBtUYrUQHCyV49LU+BjD64ikKglxElP/JwXpOedw8MkqsIA2rN2BoTNF+SFLmUuqYJI4rH5idkOq9VJxfHOHQC5zzYTGhzNAuNAz0uojnDmeqahBY=
+before_install:
+- pip install poetry
+install:
+- poetry install
+# script:
+# - poetry run flake8 my_package test
+# - poetry run coverage run --source=my_package -m unittest discover -b
+before_deploy:
+- poetry config http-basic.mypypi $PYPI_USER $PYPI_PASS
+- poetry build
+deploy:
+  provider: script
+  script: poetry publish
+  skip_cleanup: true
+  on:
+    tags: true
