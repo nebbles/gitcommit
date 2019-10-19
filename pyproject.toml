@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "conventional-commit"
-version = "0.0.5"
+version = "0.0.6"
 description = "a tool for writing conventional commits, conveniently"
 authors = ["nebbles"]
 readme = "README.md"

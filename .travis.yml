@@ -17,7 +17,7 @@ script:
 # - poetry run flake8 my_package test
 # - poetry run coverage run --source=my_package -m unittest discover -b
 before_deploy:
-- poetry config http-basic.mypypi $PYPI_USER $PYPI_PASS
+- poetry config http-basic.pypi $PYPI_USER $PYPI_PASS
 - poetry build
 deploy:
   provider: script
