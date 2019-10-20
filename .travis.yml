@@ -25,6 +25,9 @@ deploy:
   on:
     tags: true
 
+notifications:
+  email: false
+
 env:
   global:
   # Command to generate secure variables: travis encrypt VARIABLE=VALUE --add env.global
