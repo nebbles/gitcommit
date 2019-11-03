@@ -98,19 +98,19 @@ class Ansi:
         return cls.fg.bright_blue + cls.bold + str(content) + cls.reset
 
     @classmethod
-    def print_ok(cls, content, end='\n'):
+    def print_ok(cls, content, end="\n"):
         print(cls.b_green(content), end=end)
 
     @classmethod
-    def print_error(cls, content, end='\n'):
+    def print_error(cls, content, end="\n"):
         print(cls.b_red(content), end=end)
 
     @classmethod
-    def print_warning(cls, content, end='\n'):
+    def print_warning(cls, content, end="\n"):
         print(cls.b_yellow(content), end=end)
 
     @classmethod
-    def print_info(cls, content, end='\n'):
+    def print_info(cls, content, end="\n"):
         print(cls.b_blue(content), end=end)
 
 
@@ -125,20 +125,20 @@ def add_type(commit_msg):
         "revert": "Any commit that explicitly reverts part/all changes introduced in a previous commit",
         "style": "Changes to white-space, formatting, missing semi-colons, etc.",
         "test": "Changes to tests e.g. adding a new/missing test or fixing/correcting existing tests",
-        "wip": "Any code changes that are work in progress; they may not build (use these sparingly!)"
+        "wip": "Any code changes that are work in progress; they may not build (use these sparingly!)",
     }
 
     Ansi.print_info(
-        "Please specify the type of this commit using one of the available keywords. Accepted types: ")
+        "Please specify the type of this commit using one of the available keywords. Accepted types: "
+    )
 
     type_names = sorted(valid_types.keys())
-    prefixes = ["    "+str(i)+"  "+t for i, t in enumerate(type_names)]
-    prefix_length = max([len(p) for p in prefixes])+2
+    prefixes = ["    " + str(i) + "  " + t for i, t in enumerate(type_names)]
+    prefix_length = max([len(p) for p in prefixes]) + 2
 
     for i in range(len(type_names)):
         # Combine type name with type description
-        type_print = prefixes[i].ljust(prefix_length) \
-            + valid_types[type_names[i]]
+        type_print = prefixes[i].ljust(prefix_length) + valid_types[type_names[i]]
         # Wrap type name+description to maximum line length
         # type_print = "\n".join(textwrap.wrap(type_print, width=72, break_long_words=False, subsequent_indent=" "*prefix_length))
         # Print the type
@@ -146,7 +146,7 @@ def add_type(commit_msg):
 
     print()
     while True:
-        Ansi.print_ok("Type: ", end='')
+        Ansi.print_ok("Type: ", end="")
         c_type = input()
         if c_type in valid_types.keys():
             break
@@ -164,7 +164,7 @@ def add_type(commit_msg):
 
 def add_scope(commit_msg):
     Ansi.print_info("\nWhat is the scope of this commit?")
-    Ansi.print_ok("Scope (optional): ", end='')
+    Ansi.print_ok("Scope (optional): ", end="")
     c_scope = input()
 
     if c_scope != "":
@@ -178,8 +178,7 @@ def check_if_breaking_change():
     contains_break = ""
     print()  # breakline from previous section
     while True:
-        Ansi.print_warning(
-            "Does commit contain breaking change? [y/n] ", end='')
+        Ansi.print_warning("Does commit contain breaking change? [y/n] ", end="")
         contains_break = input().lower()
         if contains_break not in ["y", "n"]:
             Ansi.print_error("Answer must be 'y' or 'n'")
@@ -194,8 +193,7 @@ def check_if_breaking_change():
 
 def add_description(commit_msg):
     if IS_BREAKING_CHANGE is None:
-        raise ValueError(
-            "Global variable `IS_BREAKING_CHANGE` has not been set.")
+        raise ValueError("Global variable `IS_BREAKING_CHANGE` has not been set.")
 
     if IS_BREAKING_CHANGE:
         commit_msg += "!: "
@@ -203,19 +201,24 @@ def add_description(commit_msg):
         commit_msg += ": "
 
     num_chars_remaining = 50 - len(commit_msg)
-    Ansi.print_info("\nWhat is the commit description (i.e. title). The description is a short summary of the code changes. Note that this must be no more than {} characters.".format(
-        num_chars_remaining))
+    Ansi.print_info(
+        "\nWhat is the commit description (i.e. title). The description is a short summary of the code changes. Note that this must be no more than {} characters.".format(
+            num_chars_remaining
+        )
+    )
     c_descr = ""
     while c_descr == "":
-        Ansi.print_ok("Description: ", end='')
+        Ansi.print_ok("Description: ", end="")
         c_descr = input()
         if c_descr == "":
             Ansi.print_error("You must write a description.")
         if len(c_descr) > num_chars_remaining:
             Ansi.print_error(
-                "Your description is too long! ({} characters)".format(len(c_descr)))
+                "Your description is too long! ({} characters)".format(len(c_descr))
+            )
             Ansi.print_error(
-                "You only have {} characters available.".format(num_chars_remaining))
+                "You only have {} characters available.".format(num_chars_remaining)
+            )
             c_descr = ""  # reset string
 
     commit_msg += c_descr
@@ -224,22 +227,23 @@ def add_description(commit_msg):
 
 def add_body(commit_msg):
     if IS_BREAKING_CHANGE is None:
-        raise ValueError(
-            "Global variable `IS_BREAKING_CHANGE` has not been set.")
+        raise ValueError("Global variable `IS_BREAKING_CHANGE` has not been set.")
 
     if IS_BREAKING_CHANGE:
         Ansi.print_info(
-            "\nPlease explain what has changed in this commit to cause breaking changes.")
+            "\nPlease explain what has changed in this commit to cause breaking changes."
+        )
         c_body = ""
         while c_body == "":
-            Ansi.print_ok("Body (required): ", end='')
+            Ansi.print_ok("Body (required): ", end="")
             c_body = input()
             if c_body == "":
                 Ansi.print_error("You must explain your breaking changes.")
     else:
         Ansi.print_info(
-            "\nYou may provide additional contextual information about the code changes here.")
-        Ansi.print_ok("Body (optional): ", end='')
+            "\nYou may provide additional contextual information about the code changes here."
+        )
+        Ansi.print_ok("Body (optional): ", end="")
         c_body = input()
 
     full_body = ""
@@ -248,8 +252,7 @@ def add_body(commit_msg):
     elif c_body != "":
         full_body = c_body
 
-    full_body = "\n".join(textwrap.wrap(
-        full_body, width=72, break_long_words=False))
+    full_body = "\n".join(textwrap.wrap(full_body, width=72, break_long_words=False))
 
     if full_body != "":
         commit_msg += "\n\n" + full_body
@@ -257,8 +260,10 @@ def add_body(commit_msg):
 
 
 def add_footer(commit_msg):
-    Ansi.print_info("\nThe footer MUST contain meta-information about the commit, e.g., related pull-requests, reviewers, breaking changes, with one piece of meta-information per-line. To enter a new line, use the \\ character, NOT the 'Enter' key.'")
-    Ansi.print_ok("Footer (optional): ", end='')
+    Ansi.print_info(
+        "\nThe footer MUST contain meta-information about the commit, e.g., related pull-requests, reviewers, breaking changes, with one piece of meta-information per-line. To enter a new line, use the \\ character, NOT the 'Enter' key.'"
+    )
+    Ansi.print_ok("Footer (optional): ", end="")
     c_footer = input()
     if c_footer != "":
 
@@ -268,8 +273,11 @@ def add_footer(commit_msg):
             line = line.strip()  # clean up extraneous whitespace
 
             # format each user line with forced line breaks to maintain maximum line length
-            footer_lines[i] = "\n".join(textwrap.wrap(
-                line, width=72, break_long_words=False, subsequent_indent="  "))
+            footer_lines[i] = "\n".join(
+                textwrap.wrap(
+                    line, width=72, break_long_words=False, subsequent_indent="  "
+                )
+            )
 
         # recombine all user defined footer lines
         formatted_footer = "\n".join(footer_lines)
@@ -304,21 +312,21 @@ def run():
         # Warn of extra command line arguments
         if len(sys.argv) > 1:
             Ansi.print_warning(
-                "The following additional arguments will be passed to git commit: ", end='')
+                "The following additional arguments will be passed to git commit: ",
+                end="",
+            )
             Ansi.print_warning(sys.argv[1:])
             argv_passthrough = sys.argv[1:]  # overwrite default list
 
         # Ask for confirmation to commit
-        Ansi.print_warning(
-            "Do you want to make your commit? [y/n] ", end='')
+        Ansi.print_warning("Do you want to make your commit? [y/n] ", end="")
         confirm = input().lower()
 
         if confirm == "y":
             print()
-            cmds = ['git', 'commit', '-m', commit_msg] + argv_passthrough
+            cmds = ["git", "commit", "-m", commit_msg] + argv_passthrough
             subprocess.call(cmds)
-            Ansi.print_ok(
-                "\nCommit has been made to conventional commits standards!")
+            Ansi.print_ok("\nCommit has been made to conventional commits standards!")
             return
 
         elif confirm == "n":
