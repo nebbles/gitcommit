@@ -165,7 +165,7 @@ def add_type(commit_msg):
 def add_scope(commit_msg):
     Ansi.print_info("\nWhat is the scope of this commit?")
     Ansi.print_ok("Scope (optional): ", end="")
-    c_scope = input()
+    c_scope = input().strip()
 
     if c_scope != "":
         commit_msg += "({})".format(c_scope)
@@ -210,6 +210,14 @@ def add_description(commit_msg):
     while c_descr == "":
         Ansi.print_ok("Description: ", end="")
         c_descr = input()
+
+        # Sanitise
+        c_descr = c_descr.strip()  # remove whitespace
+        c_descr = c_descr.capitalize()  # capital first letter
+        if c_descr[-1] == ".":
+            c_descr = c_descr[:-1]  # remove period if last character
+            c_descr = c_descr.strip()  # remove further whitespace
+
         if c_descr == "":
             Ansi.print_error("You must write a description.")
         if len(c_descr) > num_chars_remaining:
@@ -252,7 +260,9 @@ def add_body(commit_msg):
     elif c_body != "":
         full_body = c_body
 
-    full_body = "\n".join(textwrap.wrap(full_body, width=72, break_long_words=False))
+    full_body = "\n".join(
+        textwrap.wrap(full_body.strip(), width=72, break_long_words=False)
+    )
 
     if full_body != "":
         commit_msg += "\n\n" + full_body
@@ -264,7 +274,7 @@ def add_footer(commit_msg):
         "\nThe footer MUST contain meta-information about the commit, e.g., related pull-requests, reviewers, breaking changes, with one piece of meta-information per-line. To enter a new line, use the \\ character, NOT the 'Enter' key.'"
     )
     Ansi.print_ok("Footer (optional): ", end="")
-    c_footer = input()
+    c_footer = input().strip()
     if c_footer != "":
 
         # divide by user defined line breaks
