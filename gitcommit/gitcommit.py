@@ -21,11 +21,11 @@
 #
 
 from __future__ import print_function
-from builtins import input
 import sys
 import subprocess
 import textwrap
 from .ansi import ANSI as Ansi
+from prompt_toolkit import prompt, ANSI
 
 IS_BREAKING_CHANGE = None  # default for global variable
 
@@ -62,8 +62,8 @@ def add_type(commit_msg):
 
     print()
     while True:
-        Ansi.print_ok("Type: ", end="")
-        c_type = input()
+        text = Ansi.b_green("Type: ")
+        c_type = prompt(ANSI(text), completer=type_completer)
         if c_type in valid_types.keys():
             break
         elif c_type in [str(n) for n in range(len(type_names))]:
@@ -80,8 +80,8 @@ def add_type(commit_msg):
 
 def add_scope(commit_msg):
     Ansi.print_info("\nWhat is the scope of this commit?")
-    Ansi.print_ok("Scope (optional): ", end="")
-    c_scope = input().strip()
+    text = Ansi.b_green("Scope (optional): ")
+    c_scope = prompt(ANSI(text)).strip()
 
     if c_scope != "":
         commit_msg += "({})".format(c_scope)
@@ -94,8 +94,8 @@ def check_if_breaking_change():
     contains_break = ""
     print()  # breakline from previous section
     while True:
-        Ansi.print_warning("Does commit contain breaking change? [y/n] ", end="")
-        contains_break = input().lower()
+        text = Ansi.b_yellow("Does commit contain breaking change? [y/n] ")
+        contains_break = prompt(ANSI(text)).lower()
         if contains_break not in ["y", "n"]:
             Ansi.print_error("Answer must be 'y' or 'n'")
             continue
@@ -124,8 +124,8 @@ def add_description(commit_msg):
     )
     c_descr = ""
     while c_descr == "":
-        Ansi.print_ok("Description: ", end="")
-        c_descr = input()
+        text = Ansi.b_green("Description: ")
+        c_descr = prompt(ANSI(text))
 
         # Sanitise
         c_descr = c_descr.strip()  # remove whitespace
@@ -159,16 +159,16 @@ def add_body(commit_msg):
         )
         c_body = ""
         while c_body == "":
-            Ansi.print_ok("Body (required): ", end="")
-            c_body = input()
+            text = Ansi.b_green("Body (required): ")
+            c_body = prompt(ANSI(text))
             if c_body == "":
                 Ansi.print_error("You must explain your breaking changes.")
     else:
         Ansi.print_info(
             "\nYou may provide additional contextual information about the code changes here."
         )
-        Ansi.print_ok("Body (optional): ", end="")
-        c_body = input()
+        text = Ansi.b_green("Body (optional): ")
+        c_body = prompt(ANSI(text))
 
     full_body = ""
     if IS_BREAKING_CHANGE:
@@ -189,8 +189,8 @@ def add_footer(commit_msg):
     Ansi.print_info(
         "\nThe footer MUST contain meta-information about the commit, e.g., related pull-requests, reviewers, breaking changes, with one piece of meta-information per-line. To enter a new line, use the \\ character, NOT the 'Enter' key.'"
     )
-    Ansi.print_ok("Footer (optional): ", end="")
-    c_footer = input().strip()
+    text = Ansi.b_green("Footer (optional): ")
+    c_footer = prompt(ANSI(text)).strip()
     if c_footer != "":
 
         # divide by user defined line breaks
@@ -245,8 +245,8 @@ def run():
             argv_passthrough = sys.argv[1:]  # overwrite default list
 
         # Ask for confirmation to commit
-        Ansi.print_warning("Do you want to make your commit? [y/n] ", end="")
-        confirm = input().lower()
+        text = Ansi.b_yellow("Do you want to make your commit? [y/n] ")
+        confirm = prompt(ANSI(text)).lower()
 
         if confirm == "y":
             print()
