@@ -77,6 +77,13 @@ The old distribution method is documented in
     python -m gitcommit
     ```
 
+Alternatively,
+
+1. Run the package using Poetry's venv as context
+    ```
+    poetry run python -m gitcommit
+    ```
+
 ## Deploy
 
 Deployment is handled automatically by Travis CI. It has been linked to the
@@ -99,3 +106,11 @@ a branch, and since its a tagged commit, will attempt to publish it to PyPI.
    ```
    git push origin --tags
    ```
+
+## Acknowledgements
+
+This work takes heavy influence from [another repository porting Commitizen to Python](https://github.com/Woile/commitizen).
+
+## License
+
+This work is published under [GNU GPLv3](./LICENSE).
