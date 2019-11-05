@@ -26,6 +26,10 @@ import subprocess
 import textwrap
 from .ansi import ANSI as Ansi
 from prompt_toolkit import prompt, ANSI
+from prompt_toolkit.completion import (  # pylint: disable=no-name-in-module
+    FuzzyWordCompleter,
+)
+
 
 IS_BREAKING_CHANGE = None  # default for global variable
 
@@ -43,6 +47,7 @@ def add_type(commit_msg):
         "test": "Changes to tests e.g. adding a new/missing test or fixing/correcting existing tests",
         "wip": "Any code changes that are work in progress; they may not build (use these sparingly!)",
     }
+    type_completer = FuzzyWordCompleter(valid_types.keys())
 
     Ansi.print_info(
         "Please specify the type of this commit using one of the available keywords. Accepted types: "
