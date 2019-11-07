@@ -162,7 +162,9 @@ def add_description(commit_msg):
     while c_descr == "":
         text = Ansi.b_green("Description: ")
         c_descr = prompt(
-            ANSI(text), validator=DescriptionValidator(num_chars_remaining)
+            ANSI(text),
+            validator=DescriptionValidator(num_chars_remaining),
+            mouse_support=True,
         )
 
     # Sanitise
@@ -199,7 +201,7 @@ def add_body(commit_msg):
             )
         )
         text = Ansi.b_green("Body (optional): ")
-        c_body = prompt(ANSI(text))
+        c_body = prompt(ANSI(text), mouse_support=True)
 
     full_body = ""
     if IS_BREAKING_CHANGE:
