@@ -39,6 +39,13 @@ except:
     WINDOW_WIDTH = 80  # default
 
 
+def wrap_width(string):
+    string_lines = textwrap.wrap(
+        string, width=WINDOW_WIDTH, break_long_words=False, replace_whitespace=False
+    )
+    return "\n".join(string_lines)
+
+
 def add_type(commit_msg):
     valid_types = {
         "feat": "MUST be used the commit adds/builds toward a new feature",
@@ -55,7 +62,9 @@ def add_type(commit_msg):
     type_completer = FuzzyWordCompleter(valid_types.keys())
 
     Ansi.print_info(
-        "Please specify the type of this commit using one of the available keywords. Accepted types: "
+        wrap_width(
+            "Please specify the type of this commit using one of the available keywords. Accepted types: "
+        )
     )
 
     type_names = sorted(valid_types.keys())
@@ -100,7 +109,11 @@ def add_type(commit_msg):
 
 
 def add_scope(commit_msg):
-    Ansi.print_info("\nWhat is the scope of this commit?")
+    Ansi.print_info(
+        wrap_width(
+            "\nWhat is the scope / a noun describing section of repo? (try to keep under 15 characters)"
+        )
+    )
     text = Ansi.b_green("Scope (optional): ")
     c_scope = prompt(ANSI(text)).strip()
 
@@ -139,8 +152,10 @@ def add_description(commit_msg):
 
     num_chars_remaining = 50 - len(commit_msg)
     Ansi.print_info(
-        "\nWhat is the commit description (i.e. title). The description is a short summary of the code changes. Note that this must be no more than {} characters.".format(
-            num_chars_remaining
+        wrap_width(
+            "\nWhat is the commit description / title. A short summary of the code changes. Use the imperative mood. No more than {} characters.".format(
+                num_chars_remaining
+            )
         )
     )
     c_descr = ""
@@ -176,7 +191,9 @@ def add_body(commit_msg):
 
     if IS_BREAKING_CHANGE:
         Ansi.print_info(
-            "\nPlease explain what has changed in this commit to cause breaking changes."
+            wrap_width(
+                "\nPlease explain what has changed in this commit to cause breaking changes."
+            )
         )
         c_body = ""
         while c_body == "":
@@ -186,7 +203,9 @@ def add_body(commit_msg):
                 Ansi.print_error("You must explain your breaking changes.")
     else:
         Ansi.print_info(
-            "\nYou may provide additional contextual information about the code changes here."
+            wrap_width(
+                "\nYou may provide additional contextual information about the code changes here."
+            )
         )
         text = Ansi.b_green("Body (optional): ")
         c_body = prompt(ANSI(text))
@@ -208,7 +227,9 @@ def add_body(commit_msg):
 
 def add_footer(commit_msg):
     Ansi.print_info(
-        "\nThe footer MUST contain meta-information about the commit, e.g., related pull-requests, reviewers, breaking changes, with one piece of meta-information per-line. To enter a new line, use the \\ character, NOT the 'Enter' key.'"
+        wrap_width(
+            "\nThe footer MUST contain meta-information about the commit, e.g., related pull-requests, reviewers, breaking changes, with one piece of meta-information per-line. To enter a new line, use the \\ character, NOT the 'Enter' key.'"
+        )
     )
     text = Ansi.b_green("Footer (optional): ")
     c_footer = prompt(ANSI(text)).strip()
