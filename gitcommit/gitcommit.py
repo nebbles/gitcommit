@@ -25,11 +25,12 @@ import os
 import sys
 import subprocess
 import textwrap
-from .ansi import ANSI as Ansi
 from prompt_toolkit import prompt, ANSI
 from prompt_toolkit.completion import (  # pylint: disable=no-name-in-module
     FuzzyWordCompleter,
 )
+from .ansi import ANSI as Ansi
+from .validators import DescriptionLengthValidator, TypeValidator
 
 
 IS_BREAKING_CHANGE = None  # default for global variable
@@ -90,19 +91,18 @@ def add_type(commit_msg):
         # Print the type
         Ansi.print_warning(type_print)
 
+    valid_numeric_types = [str(n) for n in range(len(type_names))]
+    valid_inputs = list(valid_types.keys()) + valid_numeric_types
+
     print()
-    while True:
-        text = Ansi.b_green("Type: ")
-        c_type = prompt(ANSI(text), completer=type_completer)
-        if c_type in valid_types.keys():
-            break
-        elif c_type in [str(n) for n in range(len(type_names))]:
-            # Convert from number back to proper type name
-            c_type = type_names[int(c_type)]
-            break
-        else:
-            Ansi.print_error("That is not an accepted commit 'type'.")
-            continue
+    text = Ansi.b_green("Type: ")
+    c_type = prompt(
+        ANSI(text), completer=type_completer, validator=TypeValidator(valid_inputs),
+    )
+
+    # Convert from number back to proper type name
+    if c_type in valid_numeric_types:
+        c_type = type_names[int(c_type)]
 
     commit_msg += c_type
     return commit_msg
@@ -161,25 +161,19 @@ def add_description(commit_msg):
     c_descr = ""
     while c_descr == "":
         text = Ansi.b_green("Description: ")
-        c_descr = prompt(ANSI(text))
-
-        # Sanitise
-        c_descr = c_descr.strip()  # remove whitespace
-        c_descr = c_descr.capitalize()  # capital first letter
-        if c_descr[-1] == ".":
-            c_descr = c_descr[:-1]  # remove period if last character
-            c_descr = c_descr.strip()  # remove further whitespace
+        c_descr = prompt(
+            ANSI(text), validator=DescriptionLengthValidator(num_chars_remaining)
+        )
 
         if c_descr == "":
             Ansi.print_error("You must write a description.")
-        if len(c_descr) > num_chars_remaining:
-            Ansi.print_error(
-                "Your description is too long! ({} characters)".format(len(c_descr))
-            )
-            Ansi.print_error(
-                "You only have {} characters available.".format(num_chars_remaining)
-            )
-            c_descr = ""  # reset string
+
+    # Sanitise
+    c_descr = c_descr.strip()  # remove whitespace
+    c_descr = c_descr.capitalize()  # capital first letter
+    if c_descr[-1] == ".":
+        c_descr = c_descr[:-1]  # remove period if last character
+        c_descr = c_descr.strip()  # remove further whitespace
 
     commit_msg += c_descr
     return commit_msg
