@@ -21,6 +21,7 @@
 #
 
 from __future__ import print_function
+import os
 import sys
 import subprocess
 import textwrap
@@ -32,6 +33,10 @@ from prompt_toolkit.completion import (  # pylint: disable=no-name-in-module
 
 
 IS_BREAKING_CHANGE = None  # default for global variable
+try:
+    WINDOW_WIDTH, _ = os.get_terminal_size()
+except:
+    WINDOW_WIDTH = 80  # default
 
 
 def add_type(commit_msg):
@@ -54,14 +59,25 @@ def add_type(commit_msg):
     )
 
     type_names = sorted(valid_types.keys())
-    prefixes = ["    " + str(i) + "  " + t for i, t in enumerate(type_names)]
+    # create prefixes e.g. "    0  chore"
+    prefixes = ["  " + str(i) + "  " + t for i, t in enumerate(type_names)]
     prefix_length = max([len(p) for p in prefixes]) + 2
 
     for i in range(len(type_names)):
+        # type descriptions
+        type_descr_width = WINDOW_WIDTH - prefix_length
+        descr_lines = textwrap.wrap(
+            valid_types[type_names[i]],
+            width=type_descr_width,
+            subsequent_indent=" " * prefix_length,
+            break_long_words=False,
+        )
+        # ensure each line has trailing whitespace, then do join
+        type_descr_str = "".join(map(lambda l: l.ljust(type_descr_width), descr_lines,))
+
         # Combine type name with type description
-        type_print = prefixes[i].ljust(prefix_length) + valid_types[type_names[i]]
-        # Wrap type name+description to maximum line length
-        # type_print = "\n".join(textwrap.wrap(type_print, width=72, break_long_words=False, subsequent_indent=" "*prefix_length))
+        type_print = prefixes[i].ljust(prefix_length) + type_descr_str
+
         # Print the type
         Ansi.print_warning(type_print)
 
