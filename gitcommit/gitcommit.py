@@ -30,7 +30,7 @@ from prompt_toolkit.completion import (  # pylint: disable=no-name-in-module
     FuzzyWordCompleter,
 )
 from .ansi import ANSI as Ansi
-from .validators import DescriptionLengthValidator, TypeValidator
+from .validators import DescriptionValidator, TypeValidator, YesNoValidator
 
 
 IS_BREAKING_CHANGE = None  # default for global variable
@@ -128,12 +128,12 @@ def check_if_breaking_change():
     contains_break = ""
     print()  # breakline from previous section
     while True:
-        text = Ansi.b_yellow("Does commit contain breaking change? [y/n] ")
-        contains_break = prompt(ANSI(text)).lower()
-        if contains_break not in ["y", "n"]:
-            Ansi.print_error("Answer must be 'y' or 'n'")
-            continue
-        elif contains_break == "y":
+        text = Ansi.b_yellow("Does commit contain breaking change? (no) ")
+        contains_break = prompt(ANSI(text), validator=YesNoValidator()).lower().strip()
+        if contains_break == "":  # default
+            IS_BREAKING_CHANGE = False
+            break
+        elif contains_break in ["y", "yes"]:
             IS_BREAKING_CHANGE = True
             return True
         else:
@@ -162,11 +162,8 @@ def add_description(commit_msg):
     while c_descr == "":
         text = Ansi.b_green("Description: ")
         c_descr = prompt(
-            ANSI(text), validator=DescriptionLengthValidator(num_chars_remaining)
+            ANSI(text), validator=DescriptionValidator(num_chars_remaining)
         )
-
-        if c_descr == "":
-            Ansi.print_error("You must write a description.")
 
     # Sanitise
     c_descr = c_descr.strip()  # remove whitespace
@@ -192,7 +189,7 @@ def add_body(commit_msg):
         c_body = ""
         while c_body == "":
             text = Ansi.b_green("Body (required): ")
-            c_body = prompt(ANSI(text))
+            c_body = prompt(ANSI(text)).strip()
             if c_body == "":
                 Ansi.print_error("You must explain your breaking changes.")
     else:
