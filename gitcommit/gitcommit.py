@@ -25,7 +25,9 @@ import os
 import sys
 import subprocess
 import textwrap
-from prompt_toolkit import prompt, ANSI
+from prompt_toolkit import PromptSession, prompt, ANSI
+from prompt_toolkit.application.current import get_app
+from prompt_toolkit.styles import Style
 from prompt_toolkit.completion import (  # pylint: disable=no-name-in-module
     FuzzyWordCompleter,
 )
@@ -38,6 +40,26 @@ try:
     WINDOW_WIDTH, _ = os.get_terminal_size()
 except:
     WINDOW_WIDTH = 80  # default
+
+
+class LineLengthPrompt:
+    def __init__(self, length_limit, session):
+        self.limit = length_limit
+        self.session = session
+        self.invalid_style = Style.from_dict({"rprompt": "bg:#ff0066 #000000",})
+        self.valid_style = Style.from_dict({"rprompt": "bg:#b0f566 #000000",})
+
+    def get_text(self):
+        text = get_app().current_buffer.text
+        cur_len = len(text)
+
+        if cur_len > self.limit:
+            self.session.style = self.invalid_style
+            return f" {cur_len}/{self.limit} chars "
+
+        else:
+            self.session.style = self.valid_style
+            return f" {cur_len}/{self.limit} chars "
 
 
 def wrap_width(string):
@@ -158,12 +180,16 @@ def add_description(commit_msg):
             )
         )
     )
+
     c_descr = ""
+    session = PromptSession()
+    length_prompt = LineLengthPrompt(num_chars_remaining, session)
     while c_descr == "":
         text = Ansi.b_green("Description: ")
-        c_descr = prompt(
+        c_descr = session.prompt(
             ANSI(text),
             validator=DescriptionValidator(num_chars_remaining),
+            rprompt=length_prompt.get_text,
             mouse_support=True,
         )
 
