@@ -24,6 +24,7 @@ gitcommit = 'gitcommit.gitcommit:main'
 python = "^3.6"
 prompt_toolkit = "^2.0"
 requests = "^2.22"
+pyperclip = "^1.7"
 
 [tool.poetry.dev-dependencies]
 

@@ -4,6 +4,7 @@ from prompt_toolkit import print_formatted_text
 from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.styles import Style
 from .ansi import ANSI as Ansi
+import pyperclip  # pylint: disable=import-error
 
 
 def get_github_tags():
@@ -36,6 +37,8 @@ def check_for_update():
 
     if latest_tag_version != cur_version:
         Ansi.print_ok("There is an update available for conventional-commit.")
+        upgrade_command = "pip install --upgrade conventional-commit"
+        pyperclip.copy(upgrade_command)
 
         style = Style.from_dict(
             {"green": "#a0d762 bold", "red": "#e67061 bold", "command": "#f78ae0 bold"}
@@ -46,8 +49,8 @@ def check_for_update():
                 ("class:red", cur_version),
                 ("", " → "),
                 ("class:green", latest_tag_version),
-                ("", "\nTry running: "),
-                ("class:command", "pip install --upgrade conventional-commit"),
+                ("", "\nAdded to your clipboard: "),
+                ("class:command", upgrade_command),
             ]
         )
         print_formatted_text(text, style=style)
