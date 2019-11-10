@@ -29,8 +29,12 @@ from prompt_toolkit import PromptSession, prompt, ANSI
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.styles import Style
 from .ansi import ANSI as Ansi
-from .validators import DescriptionValidator, TypeValidator, YesNoValidator
-
+from .validators import (
+    DescriptionValidator,
+    TypeValidator,
+    YesNoValidator,
+    FooterValidator,
+)
 from .completers import FuzzyWordCompleter, FooterCompleter
 
 IS_BREAKING_CHANGE = None  # default for global variable
@@ -61,10 +65,24 @@ class LineLengthPrompt:
 
 
 def wrap_width(string):
-    string_lines = textwrap.wrap(
-        string, width=WINDOW_WIDTH, break_long_words=False, replace_whitespace=False
-    )
-    return "\n".join(string_lines)
+    def format_string(string):
+        string_lines = string.split("\n")
+        string_lines_wrapped = []
+        for line in string_lines:
+            string_lines_wrapped += textwrap.wrap(
+                line,
+                width=WINDOW_WIDTH,
+                break_long_words=False,
+                replace_whitespace=False,
+            )
+        return "\n".join(string_lines_wrapped)
+
+    if type(string) is list:
+        return "\n".join([format_string(s) for s in string])
+    elif type(string) is str:
+        return format_string(string)
+    else:
+        raise TypeError("Unable to parse string argument")
 
 
 def add_type(commit_msg):
@@ -245,27 +263,45 @@ def add_body(commit_msg):
 def add_footer(commit_msg):
     Ansi.print_info(
         wrap_width(
-            "\nThe footer MUST contain meta-information about the commit, e.g., related pull-requests, reviewers, breaking changes, with one piece of meta-information per-line. To enter a new line, use the \\ character, NOT the 'Enter' key.'"
+            [
+                "\nThe footer MUST contain meta-information about the commit:",
+                " - Related pull-requests, reviewers, breaking changes",
+                " - GitHub close/fix/resolve #issue or username/repository#issue",
+                " - One piece of meta-information per-line",
+                " - To submit, press the Esc key before Enter",
+            ]
         )
     )
-    text = Ansi.b_green("Footer (optional): ")
-    c_footer = prompt(ANSI(text)).strip()
-    if c_footer != "":
 
-        # divide by user defined line breaks
-        footer_lines = c_footer.split("\\")
-        for i, line in enumerate(footer_lines):
+    def footer_prompt_continuation(width, line_number, is_soft_wrap):
+        return " " * (width - 2) + "| "
+
+    text = Ansi.b_green("Footer (optional): ")
+    session = PromptSession(
+        completer=FooterCompleter(),
+        multiline=False,
+        prompt_continuation=footer_prompt_continuation,
+    )
+    c_footer = session.prompt(ANSI(text), validator=FooterValidator(session)).strip()
+
+    if c_footer != "":
+        f_lines = c_footer.split("\n")
+        f_lines = [
+            l for l in f_lines if l.strip() != ""
+        ]  # remove any lines that are empty: ""
+
+        for i, line in enumerate(f_lines):
             line = line.strip()  # clean up extraneous whitespace
 
-            # format each user line with forced line breaks to maintain maximum line length
-            footer_lines[i] = "\n".join(
+            # format each line with forced line breaks to maintain maximum line length
+            f_lines[i] = "\n".join(
                 textwrap.wrap(
                     line, width=72, break_long_words=False, subsequent_indent="  "
                 )
             )
 
         # recombine all user defined footer lines
-        formatted_footer = "\n".join(footer_lines)
+        formatted_footer = "\n".join(f_lines)
         commit_msg += "\n\n" + formatted_footer
 
     return commit_msg
