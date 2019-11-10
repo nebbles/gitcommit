@@ -28,12 +28,10 @@ import textwrap
 from prompt_toolkit import PromptSession, prompt, ANSI
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.styles import Style
-from prompt_toolkit.completion import (  # pylint: disable=no-name-in-module
-    FuzzyWordCompleter,
-)
 from .ansi import ANSI as Ansi
 from .validators import DescriptionValidator, TypeValidator, YesNoValidator
 
+from .completers import FuzzyWordCompleter, FooterCompleter
 
 IS_BREAKING_CHANGE = None  # default for global variable
 try:
