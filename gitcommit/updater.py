@@ -47,7 +47,7 @@ def check_for_update():
                 ("", " → "),
                 ("class:green", latest_tag_version),
                 ("", "\nTry running: "),
-                ("class:command", "pip upgrade conventional-commit"),
+                ("class:command", "pip install --upgrade conventional-commit"),
             ]
         )
         print_formatted_text(text, style=style)
