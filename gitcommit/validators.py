@@ -14,9 +14,19 @@ class TypeValidator(Validator):
 
 
 class YesNoValidator(Validator):
+    def __init__(self, answer_required: bool):
+        self.answer_required = answer_required
+        self.confirmations = ["y", "yes"]
+        self.rejections = ["n", "no"]
+        self.valid_responses = self.confirmations + self.rejections
+        if not self.answer_required:
+            self.valid_responses.append("")
+
+        super().__init__()
+
     def validate(self, document):
         text = document.text
-        if text.lower().strip() not in ["", "y", "n", "yes", "no"]:
+        if text.lower().strip() not in self.valid_responses:
             raise ValidationError(message="Answer must be yes/no.")
 
 

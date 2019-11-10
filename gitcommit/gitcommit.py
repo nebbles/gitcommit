@@ -170,7 +170,11 @@ def check_if_breaking_change():
     print()  # breakline from previous section
     while True:
         text = Ansi.b_yellow("Does commit contain breaking change? (no) ")
-        contains_break = prompt(ANSI(text), validator=YesNoValidator()).lower().strip()
+        contains_break = (
+            prompt(ANSI(text), validator=YesNoValidator(answer_required=False))
+            .lower()
+            .strip()
+        )
         if contains_break == "":  # default
             IS_BREAKING_CHANGE = False
             break
