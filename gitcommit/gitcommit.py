@@ -206,7 +206,6 @@ def add_description(commit_msg):
             ANSI(text),
             validator=DescriptionValidator(num_chars_remaining),
             rprompt=length_prompt.get_text,
-            mouse_support=True,
         )
 
     # Sanitise
@@ -243,7 +242,7 @@ def add_body(commit_msg):
             )
         )
         text = Ansi.b_green("Body (optional): ")
-        c_body = prompt(ANSI(text), mouse_support=True)
+        c_body = prompt(ANSI(text))
 
     full_body = ""
     if IS_BREAKING_CHANGE:
