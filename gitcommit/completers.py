@@ -32,6 +32,25 @@ class FuzzyWordCompleter(Completer):
         return self.fuzzy_completer.get_completions(document, complete_event)
 
 
+class TypeCompleter(FuzzyWordCompleter):
+    def __init__(self):
+        self.meta_dict = {
+            "feat": "production code feature",
+            "fix": "production code fixing",
+            "chore": "build system / dependencies / config / scripts",
+            "docs": "documentation / comments",
+            "perf": "improves performance",
+            "refactor": "renaming / restructuring",
+            "revert": "revert previously commited code",
+            "style": "white-space, formatting, semi-colons, etc.",
+            "test": "any work to tests",
+            "wip": "work in progress / might not build",
+        }
+        super().__init__(
+            self.meta_dict.keys(), meta_dict=self.meta_dict, WORD=False,
+        )
+
+
 class FooterCompleter(FuzzyWordCompleter):
     def __init__(self):
         self.github_meta_info = "Closes GitHub #issue"

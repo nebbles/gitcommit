@@ -35,7 +35,7 @@ from .validators import (
     YesNoValidator,
     FooterValidator,
 )
-from .completers import FuzzyWordCompleter, FooterCompleter
+from .completers import TypeCompleter, FooterCompleter
 
 IS_BREAKING_CHANGE = None  # default for global variable
 try:
@@ -98,11 +98,13 @@ def add_type(commit_msg):
         "test": "Changes to tests e.g. adding a new/missing test or fixing/correcting existing tests",
         "wip": "Any code changes that are work in progress; they may not build (use these sparingly!)",
     }
-    type_completer = FuzzyWordCompleter(valid_types.keys())
 
     Ansi.print_info(
         wrap_width(
-            "Please specify the type of this commit using one of the available keywords. Accepted types: "
+            [
+                "Please specify the type of this commit using one of the available keywords. Accepted types: ",
+                "TAB to autocomplete...",
+            ]
         )
     )
 
@@ -135,7 +137,7 @@ def add_type(commit_msg):
     print()
     text = Ansi.b_green("Type: ")
     c_type = prompt(
-        ANSI(text), completer=type_completer, validator=TypeValidator(valid_inputs),
+        ANSI(text), completer=TypeCompleter(), validator=TypeValidator(valid_inputs),
     )
 
     # Convert from number back to proper type name
