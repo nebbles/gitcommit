@@ -335,6 +335,10 @@ def add_footer(commit_msg):
 
 def run():
     # print(sys.version + "/n")
+    if WINDOW_WIDTH < 80:
+        Ansi.print_error(
+            f"It is recommended you increase your window width ({WINDOW_WIDTH}) to at least 80."
+        )
 
     Ansi.print_ok("Starting a conventional git commit...")
 
