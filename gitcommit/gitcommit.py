@@ -37,6 +37,7 @@ from .validators import (
     FooterValidator,
 )
 from .completers import TypeCompleter, FooterCompleter
+from .updater import check_for_update
 
 IS_BREAKING_CHANGE = None  # default for global variable
 try:
@@ -363,34 +364,30 @@ def run():
 
     argv_passthrough = []  # by default add no extra arguments
 
-    while True:
-        # Warn of extra command line arguments
-        if len(sys.argv) > 1:
-            Ansi.print_warning(
-                "The following additional arguments will be passed to git commit: ",
-                end="",
-            )
-            Ansi.print_warning(sys.argv[1:])
-            argv_passthrough = sys.argv[1:]  # overwrite default list
+    # Warn of extra command line arguments
+    if len(sys.argv) > 1:
+        Ansi.print_warning(
+            "The following additional arguments will be passed to git commit: ", end="",
+        )
+        Ansi.print_warning(sys.argv[1:])
+        argv_passthrough = sys.argv[1:]  # overwrite default list
 
-        # Ask for confirmation to commit
-        text = Ansi.b_yellow("Do you want to make your commit? [y/n] ")
-        confirm = prompt(ANSI(text)).lower()
+    # Ask for confirmation to commit
+    confirmation_validator = YesNoValidator(answer_required=True)
 
-        if confirm == "y":
-            print()
-            cmds = ["git", "commit", "-m", commit_msg] + argv_passthrough
-            subprocess.call(cmds)
-            Ansi.print_ok("\nCommit has been made to conventional commits standards!")
-            return
+    text = Ansi.b_yellow("Do you want to make your commit? [y/n] ")
+    confirm = prompt(ANSI(text), validator=confirmation_validator).lower()
 
-        elif confirm == "n":
-            print("Aborting the commit.")
-            return
+    if confirm in confirmation_validator.confirmations:
+        print()
+        cmds = ["git", "commit", "-m", commit_msg] + argv_passthrough
+        subprocess.call(cmds)
+        Ansi.print_ok("\nCommit has been made to conventional commits standards!")
 
-        else:
-            Ansi.print_error("Answer must be 'y' or 'n'")
-            continue
+    elif confirm in confirmation_validator.rejections:
+        print("Aborting the commit...")
+
+    check_for_update()
 
 
 def main():
