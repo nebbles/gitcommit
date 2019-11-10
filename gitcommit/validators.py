@@ -40,18 +40,36 @@ class DescriptionValidator(Validator):
             )
 
 
+class BodyValidator(Validator):
+    def __init__(self, session, is_breaking_change: bool):
+        self.session = session
+        self.is_breaking_change = is_breaking_change
+        super().__init__()
+
+    def validate(self, document):
+        text = document.text
+
+        if text.strip() == "":
+            self.session.multiline = False
+            if self.is_breaking_change:
+                raise ValidationError(
+                    message="You must write a body for a breaking change."
+                )
+        else:
+            self.session.multiline = True
+
+
 class FooterValidator(Validator):
     def __init__(self, session):
         self.session = session
 
     def validate(self, document):
         text = document.text
-        if text.strip() != "":
-            self.session.multiline = True
-        else:
+        if text.strip() == "":
             self.session.multiline = False
+        else:
+            self.session.multiline = True
 
-        if text.strip() != "":
             input_lines = text.split("\n")
             for line in input_lines:
                 matches_incomplete = [

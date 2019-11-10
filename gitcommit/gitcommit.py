@@ -33,6 +33,7 @@ from .validators import (
     DescriptionValidator,
     TypeValidator,
     YesNoValidator,
+    BodyValidator,
     FooterValidator,
 )
 from .completers import TypeCompleter, FooterCompleter
@@ -225,39 +226,63 @@ def add_body(commit_msg):
     if IS_BREAKING_CHANGE is None:
         raise ValueError("Global variable `IS_BREAKING_CHANGE` has not been set.")
 
+    session = PromptSession()
+    body_validator = BodyValidator(session, IS_BREAKING_CHANGE)
+
     if IS_BREAKING_CHANGE:
         Ansi.print_info(
             wrap_width(
-                "\nPlease explain what has changed in this commit to cause breaking changes."
+                "\nYou must explain what has changed in this commit to cause breaking changes."
+                "Press Esc before Enter to submit."
             )
         )
-        c_body = ""
-        while c_body == "":
-            text = Ansi.b_green("Body (required): ")
-            c_body = prompt(ANSI(text)).strip()
-            if c_body == "":
-                Ansi.print_error("You must explain your breaking changes.")
+        text = Ansi.b_green("Body (required): ")
     else:
         Ansi.print_info(
             wrap_width(
-                "\nYou may provide additional contextual information about the code changes here."
+                [
+                    "\nYou may provide additional contextual information about the code changes here.",
+                    "Press Esc before Enter to submit.",
+                ]
             )
         )
         text = Ansi.b_green("Body (optional): ")
-        c_body = prompt(ANSI(text))
 
-    full_body = ""
+    c_body = session.prompt(ANSI(text), validator=body_validator)
+    c_body = c_body.strip()  # remove leading/trailing whitespace
+    c_body = c_body.capitalize()  # capital first letter
+
     if IS_BREAKING_CHANGE:
         full_body = "BREAKING CHANGE: " + c_body
-    elif c_body != "":
-        full_body = c_body
 
-    full_body = "\n".join(
-        textwrap.wrap(full_body.strip(), width=72, break_long_words=False)
-    )
+    if c_body != "":
 
-    if full_body != "":
+        b_lines = c_body.split("\n")
+        num_blank_lines = 0  # track the number of consecutive blank lines
+
+        condensed_b_lines = []
+        for line in b_lines:
+            l_stripped = line.strip()
+            if l_stripped == "":
+                num_blank_lines += 1
+            else:
+                num_blank_lines = 0
+
+            if num_blank_lines > 1:
+                continue  # ignore any blank lines after the first
+            else:
+                # format each line with forced line breaks to maintain maximum line length
+                wrapped_line = "\n".join(
+                    textwrap.wrap(l_stripped, width=72, break_long_words=False)
+                )
+                condensed_b_lines.append(wrapped_line)
+
+        # recombine all user defined lines
+        full_body = "\n".join(condensed_b_lines)
+
+        # append to commit message
         commit_msg += "\n\n" + full_body
+
     return commit_msg
 
 
