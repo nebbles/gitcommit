@@ -23,6 +23,7 @@ gitcommit = 'gitcommit.gitcommit:main'
 [tool.poetry.dependencies]
 python = "^3.6"
 prompt_toolkit = "^2.0"
+requests = "^2.22"
 
 [tool.poetry.dev-dependencies]
 
