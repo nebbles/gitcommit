@@ -1,5 +1,6 @@
 import requests
 import re
+import os
 from prompt_toolkit import print_formatted_text
 from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.styles import Style
@@ -19,7 +20,9 @@ def get_github_tags():
 
 
 def find_version():
-    with open("gitcommit/__version__.py", "r") as f:
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    version_file_path = os.path.join(dir_path, "__version__.py")
+    with open(version_file_path, "r") as f:
         version_file = f.read()
         version_match = re.search(
             r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M
