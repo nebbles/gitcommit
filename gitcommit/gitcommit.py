@@ -38,6 +38,7 @@ from .validators import (
 )
 from .completers import TypeCompleter, FooterCompleter
 from .updater import check_for_update
+from .utils import capitaliseFirst
 
 IS_BREAKING_CHANGE = None  # default for global variable
 try:
@@ -218,7 +219,7 @@ def add_description(commit_msg):
 
     # Sanitise
     c_descr = c_descr.strip()  # remove whitespace
-    c_descr = c_descr.capitalize()  # capital first letter
+    c_descr = capitaliseFirst(c_descr)  # capital first letter
     if c_descr[-1] == ".":
         c_descr = c_descr[:-1]  # remove period if last character
         c_descr = c_descr.strip()  # remove further whitespace
@@ -255,7 +256,7 @@ def add_body(commit_msg):
 
     c_body = session.prompt(ANSI(text), validator=body_validator)
     c_body = c_body.strip()  # remove leading/trailing whitespace
-    c_body = c_body.capitalize()  # capital first letter
+    c_body = capitaliseFirst(c_body)  # capital first letter
 
     if IS_BREAKING_CHANGE:
         full_body = "BREAKING CHANGE: " + c_body
