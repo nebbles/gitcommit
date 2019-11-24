@@ -51,16 +51,20 @@ The old distribution method is documented in
 
 ## Getting started
 
-1. Make sure you have [Poetry](https://github.com/sdispater/poetry) installed.
+1. Make sure you have [pre-commit](https://pre-commit.com/#install) installed.
 
 1. Make sure you have [pyenv](https://github.com/pyenv/pyenv) installed.
 
-1. Git clone.
+1. Make sure you have [Poetry](https://github.com/sdispater/poetry) installed.
+
+1. `git clone`
+
+1. `pre-commit install`
 
 1. It is highly recommend you enable setting for storing the venvs within your projects.
-   ```
-   poetry config settings.virtualenvs.in-project true
-   ```
+    ```
+    poetry config settings.virtualenvs.in-project true
+    ```
 
 1. Install project dependencies.
     ```
