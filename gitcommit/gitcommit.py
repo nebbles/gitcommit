@@ -51,8 +51,8 @@ class LineLengthPrompt:
     def __init__(self, length_limit, session):
         self.limit = length_limit
         self.session = session
-        self.invalid_style = Style.from_dict({"rprompt": "bg:#ff0066 #000000",})
-        self.valid_style = Style.from_dict({"rprompt": "bg:#b0f566 #000000",})
+        self.invalid_style = Style.from_dict({"rprompt": "bg:#ff0066 #000000"})
+        self.valid_style = Style.from_dict({"rprompt": "bg:#b0f566 #000000"})
 
     def get_text(self):
         text = get_app().current_buffer.text
@@ -126,7 +126,7 @@ def add_type(commit_msg):
             break_long_words=False,
         )
         # ensure each line has trailing whitespace, then do join
-        type_descr_str = "".join(map(lambda l: l.ljust(type_descr_width), descr_lines,))
+        type_descr_str = "".join(map(lambda l: l.ljust(type_descr_width), descr_lines))
 
         # Combine type name with type description
         type_print = prefixes[i].ljust(prefix_length) + type_descr_str
@@ -140,7 +140,7 @@ def add_type(commit_msg):
     print()
     text = Ansi.b_green("Type: ")
     c_type = prompt(
-        ANSI(text), completer=TypeCompleter(), validator=TypeValidator(valid_inputs),
+        ANSI(text), completer=TypeCompleter(), validator=TypeValidator(valid_inputs)
     )
 
     # Convert from number back to proper type name
@@ -368,7 +368,7 @@ def run():
     # Warn of extra command line arguments
     if len(sys.argv) > 1:
         Ansi.print_warning(
-            "The following additional arguments will be passed to git commit: ", end="",
+            "The following additional arguments will be passed to git commit: ", end=""
         )
         Ansi.print_warning(sys.argv[1:])
         argv_passthrough = sys.argv[1:]  # overwrite default list

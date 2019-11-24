@@ -1,4 +1,4 @@
-from prompt_toolkit.completion import (  # pylint: disable=no-name-in-module
+from prompt_toolkit.completion import (
     Completer,
     Completion,
     FuzzyCompleter,
@@ -46,9 +46,7 @@ class TypeCompleter(FuzzyWordCompleter):
             "test": "any work to tests",
             "wip": "work in progress / might not build",
         }
-        super().__init__(
-            self.meta_dict.keys(), meta_dict=self.meta_dict, WORD=False,
-        )
+        super().__init__(self.meta_dict.keys(), meta_dict=self.meta_dict, WORD=False)
 
 
 class FooterCompleter(FuzzyWordCompleter):
@@ -68,6 +66,5 @@ class FooterCompleter(FuzzyWordCompleter):
             "Clubhouse [branch ch": "Associates branch with ticket",
         }
         super().__init__(
-            self.footer_meta_dict.keys(), meta_dict=self.footer_meta_dict, WORD=False,
+            self.footer_meta_dict.keys(), meta_dict=self.footer_meta_dict, WORD=False
         )
-

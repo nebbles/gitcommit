@@ -2,7 +2,7 @@
 
 The following instructions explain how this command-line application is
 distributed. We deploy our builds to the Python Package Index for distribution.
-This allows users to install the application with a simple 
+This allows users to install the application with a simple
 `pip install conventional-commit`.
 
 First ensure necessary packages are installed

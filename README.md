@@ -5,7 +5,9 @@
   <br><br>
   <a href="https://badge.fury.io/py/conventional-commit"><img src="https://badge.fury.io/py/conventional-commit.svg" alt="PyPI version" height="18"></a>
   <a href="https://travis-ci.org/nebbles/gitcommit/branches"><img src="https://travis-ci.org/nebbles/gitcommit.svg?branch=master" alt="Travis CI build" height="18"></a>
+  <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" height="18"></a>
 </p>
+
 
 # Install
 
@@ -42,7 +44,7 @@ Additional rules implemeted:
 
 # Development
 
-The old distribution method is documented in 
+The old distribution method is documented in
 [docs/dev_distibution_legacy.md](docs/dev_distribution_legacy.md)
 
 *Note: if modifying `.travis.yml` you should verify it by running `travis lint .travis.yml`*
