@@ -90,6 +90,12 @@ Alternatively,
     poetry run python -m gitcommit
     ```
 
+Or, if in another directory,
+
+1.  ```
+    ~/GitHub/gitcommit/.venv/bin/python -m gitcommit
+    ```
+
 ## Deploy
 
 Deployment is handled automatically by Travis CI. It has been linked to the
