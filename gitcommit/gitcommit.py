@@ -382,8 +382,11 @@ def run():
     if confirm in confirmation_validator.confirmations:
         print()
         cmds = ["git", "commit", "-m", commit_msg] + argv_passthrough
-        subprocess.call(cmds)
-        Ansi.print_ok("\nCommit has been made to conventional commits standards!")
+        returncode = subprocess.run(cmds).returncode
+        if returncode == 0:
+            Ansi.print_ok("\nCommit has been made to conventional commits standards!")
+        else:
+            Ansi.print_error("\nThere was an error whilst attempting the commit!")
 
     elif confirm in confirmation_validator.rejections:
         print("Aborting the commit...")
