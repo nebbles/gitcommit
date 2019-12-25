@@ -29,7 +29,7 @@ from prompt_toolkit import PromptSession, prompt, ANSI
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.styles import Style
-from gitcommit.ansi import ANSI as Ansi
+from gitcommit.style import Ansi
 from gitcommit.validators import (
     DescriptionValidator,
     TypeValidator,

@@ -4,10 +4,9 @@ import os
 from prompt_toolkit import print_formatted_text
 from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.styles import Style
-from gitcommit.ansi import ANSI as Ansi
 import pyperclip  # pylint: disable=import-error
 from packaging import version
-from gitcommit.style import style
+from gitcommit.style import style, Ansi
 
 
 def get_github_tags():
@@ -51,9 +50,6 @@ def check_for_update():
         upgrade_command = "pip install --upgrade conventional-commit"
         pyperclip.copy(upgrade_command)
 
-        style = Style.from_dict(
-            {"green": "#a0d762 bold", "red": "#e67061 bold", "command": "#f78ae0 bold"}
-        )
         text = FormattedText(
             [
                 ("", "Version "),
