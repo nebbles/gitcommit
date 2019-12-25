@@ -26,6 +26,7 @@ import sys
 import subprocess
 import textwrap
 from prompt_toolkit import PromptSession, prompt, ANSI
+from prompt_toolkit.history import FileHistory
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.styles import Style
 from .ansi import ANSI as Ansi
@@ -39,6 +40,8 @@ from .validators import (
 from .completers import TypeCompleter, FooterCompleter
 from .updater import check_for_update
 from .utils import capitaliseFirst
+
+CONFIG_HOME_DIR = "~/.gitcommit/"
 
 IS_BREAKING_CHANGE = None  # default for global variable
 try:
@@ -139,8 +142,12 @@ def add_type(commit_msg):
 
     print()
     text = Ansi.b_green("Type: ")
+    history_file_path = os.path.join(CONFIG_HOME_DIR, "type_history")
     c_type = prompt(
-        ANSI(text), completer=TypeCompleter(), validator=TypeValidator(valid_inputs)
+        ANSI(text),
+        completer=TypeCompleter(),
+        validator=TypeValidator(valid_inputs),
+        history=FileHistory(history_file_path),
     )
 
     # Convert from number back to proper type name
@@ -158,7 +165,8 @@ def add_scope(commit_msg):
         )
     )
     text = Ansi.colour(Ansi.fg.bright_green, "Scope (optional): ")
-    c_scope = prompt(ANSI(text)).strip()
+    history_file_path = os.path.join(CONFIG_HOME_DIR, "scope_history")
+    c_scope = prompt(ANSI(text), history=FileHistory(history_file_path)).strip()
 
     if c_scope != "":
         commit_msg += "({})".format(c_scope)
@@ -207,7 +215,10 @@ def add_description(commit_msg):
     )
 
     c_descr = ""
-    session = PromptSession()
+
+    history_file_path = os.path.join(CONFIG_HOME_DIR, "description_history")
+    session = PromptSession(history=FileHistory(history_file_path))
+
     length_prompt = LineLengthPrompt(num_chars_remaining, session)
     while c_descr == "":
         text = Ansi.b_green("Description: ")
@@ -237,7 +248,11 @@ def add_body(commit_msg):
     if IS_BREAKING_CHANGE is None:
         raise ValueError("Global variable `IS_BREAKING_CHANGE` has not been set.")
 
-    session = PromptSession(prompt_continuation=custom_prompt_continuation)
+    history_file_path = os.path.join(CONFIG_HOME_DIR, "body_history")
+    session = PromptSession(
+        prompt_continuation=custom_prompt_continuation,
+        history=FileHistory(history_file_path),
+    )
     body_validator = BodyValidator(session, IS_BREAKING_CHANGE)
 
     if IS_BREAKING_CHANGE:
@@ -314,10 +329,12 @@ def add_footer(commit_msg):
     )
 
     text = Ansi.colour(Ansi.fg.bright_green, "Footer (optional) ┃ ")
+    history_file_path = os.path.join(CONFIG_HOME_DIR, "footer_history")
     session = PromptSession(
         completer=FooterCompleter(),
         multiline=False,
         prompt_continuation=custom_prompt_continuation,
+        history=FileHistory(history_file_path),
     )
     c_footer = session.prompt(ANSI(text), validator=FooterValidator(session)).strip()
 
@@ -346,12 +363,20 @@ def add_footer(commit_msg):
 
 def run():
     # print(sys.version + "/n")
+    # Ensure the config directory exists
+    os.makedirs(CONFIG_HOME_DIR, exist_ok=True)
+
     if WINDOW_WIDTH < 80:
         Ansi.print_error(
             f"It is recommended you increase your window width ({WINDOW_WIDTH}) to at least 80."
         )
 
-    Ansi.print_ok("Starting a conventional git commit...")
+    print("Starting a conventional git commit...")
+    print(
+        Ansi.colour(
+            Ansi.fg.bright_red, "Tip: Press the up arrow key to recall history!"
+        )
+    )
 
     commit_msg = ""
     commit_msg = add_type(commit_msg)
