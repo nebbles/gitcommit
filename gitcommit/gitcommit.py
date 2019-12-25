@@ -300,9 +300,21 @@ def add_body(commit_msg):
             if num_blank_lines > 1:
                 continue  # ignore any blank lines after the first
             else:
+                # check if we are dealing with a bulleted line
+                bulleted_line = False
+                if l_stripped[0] in ["*", "-"]:
+                    bulleted_line = True
+                    line_after_bullet = l_stripped[1:].strip()
+                    l_stripped = " " + l_stripped[0] + " " + line_after_bullet
+
                 # format each line with forced line breaks to maintain maximum line length
                 wrapped_line = "\n".join(
-                    textwrap.wrap(l_stripped, width=72, break_long_words=False)
+                    textwrap.wrap(
+                        l_stripped,
+                        width=72,
+                        break_long_words=False,
+                        subsequent_indent="   " if bulleted_line else "",
+                    )
                 )
                 condensed_b_lines.append(wrapped_line)
 
