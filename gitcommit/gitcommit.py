@@ -365,15 +365,13 @@ def run():
 
     # print("\nNOTE: This was a dry run and no commit was made.\n")
 
+    # Extra command line arguments for git commit
     argv_passthrough = []  # by default add no extra arguments
-
-    # Warn of extra command line arguments
     if len(sys.argv) > 1:
-        Ansi.print_warning(
-            "The following additional arguments will be passed to git commit: ", end=""
-        )
-        Ansi.print_warning(sys.argv[1:])
         argv_passthrough = sys.argv[1:]  # overwrite default list
+    existing_args = " ".join(argv_passthrough)
+    text = Ansi.colour(Ansi.fg.bright_yellow, "Extra args for git commit: ")
+    argv_passthrough = prompt(ANSI(text), default=existing_args).split(" ")
 
     # Ask for confirmation to commit
     confirmation_validator = YesNoValidator(answer_required=True)
