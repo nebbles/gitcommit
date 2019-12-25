@@ -29,17 +29,18 @@ from prompt_toolkit import PromptSession, prompt, ANSI
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.styles import Style
-from .ansi import ANSI as Ansi
-from .validators import (
+from gitcommit.ansi import ANSI as Ansi
+from gitcommit.validators import (
     DescriptionValidator,
     TypeValidator,
     YesNoValidator,
     BodyValidator,
     FooterValidator,
 )
-from .completers import TypeCompleter, FooterCompleter
-from .updater import check_for_update
-from .utils import capitaliseFirst
+from gitcommit.completers import TypeCompleter, FooterCompleter
+from gitcommit.updater import check_for_update
+from gitcommit.utils import capitaliseFirst
+from gitcommit.style import style
 
 CONFIG_HOME_DIR = "~/.gitcommit/"
 
