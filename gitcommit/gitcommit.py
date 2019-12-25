@@ -157,7 +157,7 @@ def add_scope(commit_msg):
             "\nWhat is the scope / a noun describing section of repo? (try to keep under 15 characters)"
         )
     )
-    text = Ansi.b_green("Scope (optional): ")
+    text = Ansi.colour(Ansi.fg.bright_green, "Scope (optional): ")
     c_scope = prompt(ANSI(text)).strip()
 
     if c_scope != "":
@@ -243,21 +243,24 @@ def add_body(commit_msg):
     if IS_BREAKING_CHANGE:
         Ansi.print_info(
             wrap_width(
-                "\nYou must explain what has changed in this commit to cause breaking changes."
-                "Press Esc before Enter to submit."
-            )
-        )
-        text = Ansi.b_green("Body (required) ┃ ")
-    else:
-        Ansi.print_info(
-            wrap_width(
                 [
-                    "\nYou may provide additional contextual information about the code changes here.",
+                    "\nExplain what has changed in this commit to cause breaking changes.",
                     "Press Esc before Enter to submit.",
                 ]
             )
         )
-        text = Ansi.b_green("Body (optional) ┃ ")
+        # text = Ansi.b_green("Body (required) ┃ ")
+        text = Ansi.colour(Ansi.fg.bright_green, Ansi.bold, "Body ┃ ")
+    else:
+        Ansi.print_info(
+            wrap_width(
+                [
+                    "\nProvide additional contextual information about the changes here.",
+                    "Press Esc before Enter to submit.",
+                ]
+            )
+        )
+        text = Ansi.colour(Ansi.fg.bright_green, "Body (optional) ┃ ")
 
     c_body = session.prompt(ANSI(text), validator=body_validator)
     c_body = c_body.strip()  # remove leading/trailing whitespace
@@ -310,7 +313,7 @@ def add_footer(commit_msg):
         )
     )
 
-    text = Ansi.b_green("Footer (optional) ┃ ")
+    text = Ansi.colour(Ansi.fg.bright_green, "Footer (optional) ┃ ")
     session = PromptSession(
         completer=FooterCompleter(),
         multiline=False,
