@@ -35,7 +35,13 @@ def find_version():
 
 
 def check_for_update():
-    tags = get_github_tags()
+    try:
+        tags = get_github_tags()
+    except Exception as e:
+        print(
+            "An error occured whilst checking for updates. Check your network connection."
+        )
+        return
     latest_tag_version = tags[0][1:]
     cur_version = find_version()
 

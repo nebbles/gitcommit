@@ -423,10 +423,7 @@ def run():
     elif confirm in confirmation_validator.rejections:
         print("Aborting the commit...")
 
-    try:
-        check_for_update()
-    except:
-        print("An error occured whilst checking for updates.")
+    check_for_update()
 
 
 def main():
