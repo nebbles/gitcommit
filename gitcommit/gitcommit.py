@@ -399,7 +399,11 @@ def run():
         argv_passthrough = sys.argv[1:]  # overwrite default list
     existing_args = " ".join(argv_passthrough)
     text = Ansi.colour(Ansi.fg.bright_yellow, "Extra args for git commit: ")
-    argv_passthrough = prompt(ANSI(text), default=existing_args).split(" ")
+    extra_args_str = prompt(ANSI(text), default=existing_args)
+    if extra_args_str != "":
+        argv_passthrough = extra_args_str.split(" ")
+    else:
+        argv_passthrough = []
 
     # Ask for confirmation to commit
     confirmation_validator = YesNoValidator(answer_required=True)
