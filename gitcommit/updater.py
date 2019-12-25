@@ -6,6 +6,7 @@ from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.styles import Style
 from .ansi import ANSI as Ansi
 import pyperclip  # pylint: disable=import-error
+from packaging import version
 
 
 def get_github_tags():
@@ -38,7 +39,7 @@ def check_for_update():
     latest_tag_version = tags[0][1:]
     cur_version = find_version()
 
-    if latest_tag_version != cur_version:
+    if version.parse(cur_version) < version.parse(latest_tag_version):
         Ansi.print_ok("There is an update available for conventional-commit.")
         upgrade_command = "pip install --upgrade conventional-commit"
         pyperclip.copy(upgrade_command)
