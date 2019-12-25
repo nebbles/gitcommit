@@ -15,7 +15,8 @@ script:
 # - poetry run coverage run --source=my_package -m unittest discover -b
 
 before_deploy:
-- poetry config http-basic.pypi $PYPI_USER $PYPI_PASS
+# - poetry config http-basic.pypi $PYPI_USER $PYPI_PASS
+- poetry config pypi-token.pypi $PYPI_TOKEN
 - poetry build
 
 deploy:
