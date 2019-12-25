@@ -109,7 +109,7 @@ a branch, and since its a tagged commit, will attempt to publish it to PyPI.
    poetry version [patch|minor|major]
    ```
 
-1. Tag the commit (by default applies to HEAD commit).
+1. Tag the commit (by default applies to HEAD commit - make sure you are on the latest `develop` commit).
    ```
    git tag v#.#.#
    ```
@@ -121,7 +121,7 @@ a branch, and since its a tagged commit, will attempt to publish it to PyPI.
 
 ## Acknowledgements
 
-This work takes heavy influence from [another repository porting Commitizen to Python](https://github.com/Woile/commitizen).
+This work takes inspiration from [another repository porting Commitizen to Python](https://github.com/Woile/commitizen). This repository however uses none of the same source code and is focusing on a different approach.
 
 ## License
 
