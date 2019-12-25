@@ -228,11 +228,16 @@ def add_description(commit_msg):
     return commit_msg
 
 
+def custom_prompt_continuation(width, line_number, is_soft_wrap):
+    text_continuation = " " * (width - 2) + "┃ "
+    return ANSI(Ansi.colour(Ansi.fg.bright_green, text_continuation))
+
+
 def add_body(commit_msg):
     if IS_BREAKING_CHANGE is None:
         raise ValueError("Global variable `IS_BREAKING_CHANGE` has not been set.")
 
-    session = PromptSession()
+    session = PromptSession(prompt_continuation=custom_prompt_continuation)
     body_validator = BodyValidator(session, IS_BREAKING_CHANGE)
 
     if IS_BREAKING_CHANGE:
@@ -242,7 +247,7 @@ def add_body(commit_msg):
                 "Press Esc before Enter to submit."
             )
         )
-        text = Ansi.b_green("Body (required): ")
+        text = Ansi.b_green("Body (required) ┃ ")
     else:
         Ansi.print_info(
             wrap_width(
@@ -252,7 +257,7 @@ def add_body(commit_msg):
                 ]
             )
         )
-        text = Ansi.b_green("Body (optional): ")
+        text = Ansi.b_green("Body (optional) ┃ ")
 
     c_body = session.prompt(ANSI(text), validator=body_validator)
     c_body = c_body.strip()  # remove leading/trailing whitespace
@@ -305,14 +310,11 @@ def add_footer(commit_msg):
         )
     )
 
-    def footer_prompt_continuation(width, line_number, is_soft_wrap):
-        return " " * (width - 2) + "| "
-
-    text = Ansi.b_green("Footer (optional): ")
+    text = Ansi.b_green("Footer (optional) ┃ ")
     session = PromptSession(
         completer=FooterCompleter(),
         multiline=False,
-        prompt_continuation=footer_prompt_continuation,
+        prompt_continuation=custom_prompt_continuation,
     )
     c_footer = session.prompt(ANSI(text), validator=FooterValidator(session)).strip()
 

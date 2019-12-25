@@ -51,6 +51,11 @@ class ANSI:
         bright_white = "\033[107m"
 
     @classmethod
+    def colour(cls, *args):
+        """Combines all args into string. Should pass colour modifiers in first followed by the string. Does not need reset sequence at the end."""
+        return "".join(args) + cls.reset
+
+    @classmethod
     def b_green(cls, content):
         return cls.fg.bright_green + cls.bold + str(content) + cls.reset
 
