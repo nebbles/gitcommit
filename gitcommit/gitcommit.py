@@ -42,7 +42,8 @@ from gitcommit.updater import check_for_update
 from gitcommit.utils import capitaliseFirst
 from gitcommit.style import style
 
-CONFIG_HOME_DIR = "~/.gitcommit/"
+home = os.path.expanduser("~")
+CONFIG_HOME_DIR = os.path.join(home, ".gitcommit/")
 
 IS_BREAKING_CHANGE = None  # default for global variable
 try:
