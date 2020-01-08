@@ -301,6 +301,9 @@ def add_body(commit_msg):
 
             if num_blank_lines > 1:
                 continue  # ignore any blank lines after the first
+            elif l_stripped == "":
+                # skip any processing and add to output if blank
+                condensed_b_lines.append(l_stripped)
             else:
                 # check if we are dealing with a bulleted line
                 bulleted_line = False
