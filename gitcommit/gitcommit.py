@@ -283,10 +283,9 @@ def add_body(commit_msg):
     c_body = c_body.strip()  # remove leading/trailing whitespace
     c_body = capitaliseFirst(c_body)  # capital first letter
 
-    if IS_BREAKING_CHANGE:
-        full_body = "BREAKING CHANGE: " + c_body
-
     if c_body != "":
+        if IS_BREAKING_CHANGE:
+            c_body = "BREAKING CHANGE: " + c_body
 
         b_lines = c_body.split("\n")
         num_blank_lines = 0  # track the number of consecutive blank lines
