@@ -34,7 +34,7 @@ def find_version():
         raise RuntimeError("Unable to find version string in __version__.py.")
 
 
-def check_for_update():
+def check_for_update(verbose=False):
     try:
         tags = get_github_tags()
     except Exception as e:
@@ -61,3 +61,5 @@ def check_for_update():
             ]
         )
         print_formatted_text(text, style=style)
+    elif verbose:
+        print("Current version:", cur_version)

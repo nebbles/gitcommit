@@ -406,6 +406,10 @@ def add_footer(commit_msg):
 def run(args):
     # print(sys.version + "/n")
 
+    if len(args) > 0 and args[0] in ["version", "update"]:
+        check_for_update(verbose=True)
+        return  # Exit early
+
     # Ensure the config directory exists
     os.makedirs(CONFIG_HOME_DIR, exist_ok=True)
 
