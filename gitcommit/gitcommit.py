@@ -29,6 +29,7 @@ from prompt_toolkit import PromptSession, prompt, ANSI
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.styles import Style
+from prompt_toolkit.key_binding import KeyBindings
 from gitcommit.style import Ansi
 from gitcommit.validators import (
     DescriptionValidator,
@@ -50,6 +51,15 @@ try:
     WINDOW_WIDTH, _ = os.get_terminal_size()
 except:
     WINDOW_WIDTH = 80  # default
+
+
+bindings = KeyBindings()
+
+
+@bindings.add("s-down")
+def emulate_submit(event):
+    "Emulate the enter key for text submission with Shift+Down"
+    get_app().current_buffer.validate_and_handle()
 
 
 class LineLengthPrompt:
@@ -150,6 +160,7 @@ def add_type(commit_msg):
         completer=TypeCompleter(),
         validator=TypeValidator(valid_inputs),
         history=FileHistory(history_file_path),
+        key_bindings=bindings,
     )
 
     # Convert from number back to proper type name
@@ -168,7 +179,9 @@ def add_scope(commit_msg):
     )
     text = Ansi.colour(Ansi.fg.bright_green, "Scope (optional): ")
     history_file_path = os.path.join(CONFIG_HOME_DIR, "scope_history")
-    c_scope = prompt(ANSI(text), history=FileHistory(history_file_path)).strip()
+    c_scope = prompt(
+        ANSI(text), history=FileHistory(history_file_path), key_bindings=bindings
+    ).strip()
 
     if c_scope != "":
         commit_msg += "({})".format(c_scope)
@@ -183,7 +196,11 @@ def check_if_breaking_change():
     while True:
         text = Ansi.b_yellow("Does commit contain breaking change? (no) ")
         contains_break = (
-            prompt(ANSI(text), validator=YesNoValidator(answer_required=False))
+            prompt(
+                ANSI(text),
+                validator=YesNoValidator(answer_required=False),
+                key_bindings=bindings,
+            )
             .lower()
             .strip()
         )
@@ -219,7 +236,9 @@ def add_description(commit_msg):
     c_descr = ""
 
     history_file_path = os.path.join(CONFIG_HOME_DIR, "description_history")
-    session = PromptSession(history=FileHistory(history_file_path))
+    session = PromptSession(
+        history=FileHistory(history_file_path), key_bindings=bindings
+    )
 
     length_prompt = LineLengthPrompt(num_chars_remaining, session)
     while c_descr == "":
@@ -254,6 +273,7 @@ def add_body(commit_msg):
     session = PromptSession(
         prompt_continuation=custom_prompt_continuation,
         history=FileHistory(history_file_path),
+        key_bindings=bindings,
     )
     body_validator = BodyValidator(session, IS_BREAKING_CHANGE)
 
@@ -352,6 +372,7 @@ def add_footer(commit_msg):
         multiline=False,
         prompt_continuation=custom_prompt_continuation,
         history=FileHistory(history_file_path),
+        key_bindings=bindings,
     )
     c_footer = session.prompt(ANSI(text), validator=FooterValidator(session)).strip()
 
@@ -435,7 +456,10 @@ def run(args):
     text = Ansi.colour(Ansi.fg.bright_yellow, "Extra args for git commit: ")
     extra_args_file_path = os.path.join(CONFIG_HOME_DIR, "extra_args_history")
     extra_args_str = prompt(
-        ANSI(text), default=existing_args, history=FileHistory(extra_args_file_path)
+        ANSI(text),
+        default=existing_args,
+        history=FileHistory(extra_args_file_path),
+        key_bindings=bindings,
     )
     if extra_args_str != "":
         argv_passthrough = extra_args_str.split(" ")
@@ -445,7 +469,9 @@ def run(args):
     # Ask for confirmation to commit
     confirmation_validator = YesNoValidator(answer_required=True)
     text = Ansi.b_yellow("Do you want to make your commit? [y/n] ")
-    confirm = prompt(ANSI(text), validator=confirmation_validator).lower()
+    confirm = prompt(
+        ANSI(text), validator=confirmation_validator, key_bindings=bindings
+    ).lower()
 
     if confirm in confirmation_validator.confirmations:
         commit_msg_history.store_string(commit_msg)
