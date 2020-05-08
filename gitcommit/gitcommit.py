@@ -317,6 +317,7 @@ def add_body(commit_msg):
                         l_stripped,
                         width=72,
                         break_long_words=False,
+                        break_on_hyphens=False,
                         subsequent_indent="   " if bulleted_line else "",
                     )
                 )
