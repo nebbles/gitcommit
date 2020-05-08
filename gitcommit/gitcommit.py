@@ -433,7 +433,10 @@ def run(args):
         argv_passthrough = args[1:]  # overwrite default list
     existing_args = " ".join(argv_passthrough)
     text = Ansi.colour(Ansi.fg.bright_yellow, "Extra args for git commit: ")
-    extra_args_str = prompt(ANSI(text), default=existing_args)
+    extra_args_file_path = os.path.join(CONFIG_HOME_DIR, "extra_args_history")
+    extra_args_str = prompt(
+        ANSI(text), default=existing_args, history=FileHistory(extra_args_file_path)
+    )
     if extra_args_str != "":
         argv_passthrough = extra_args_str.split(" ")
     else:
