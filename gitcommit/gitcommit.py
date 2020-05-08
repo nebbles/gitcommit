@@ -382,32 +382,45 @@ def add_footer(commit_msg):
     return commit_msg
 
 
-def run():
+def run(args):
     # print(sys.version + "/n")
+
     # Ensure the config directory exists
     os.makedirs(CONFIG_HOME_DIR, exist_ok=True)
+
+    commits_file_path = os.path.join(CONFIG_HOME_DIR, "commit_msg_history")
+    commit_msg_history = FileHistory(commits_file_path)
 
     if WINDOW_WIDTH < 80:
         Ansi.print_error(
             f"It is recommended you increase your window width ({WINDOW_WIDTH}) to at least 80."
         )
 
-    print("Starting a conventional git commit...")
-    print(
-        Ansi.colour(
-            Ansi.fg.bright_red, "Tip: Press the up arrow key to recall history!"
-        )
-    )
-
     commit_msg = ""
-    commit_msg = add_type(commit_msg)
-    commit_msg = add_scope(commit_msg)
-    check_if_breaking_change()
-    commit_msg = add_description(commit_msg)
-    commit_msg = add_body(commit_msg)
-    commit_msg = add_footer(commit_msg)
+    if len(args) > 0 and args[0] == "retry":
+        args = args[1:]  # consume the first arg
+        cm_histories_iter = commit_msg_history.load_history_strings()
+        last_commit_msg = ""
+        for last_commit_msg in cm_histories_iter:
+            pass
+        commit_msg = last_commit_msg
 
-    Ansi.print_ok("\nThis is your commit message:")
+    if commit_msg == "":
+        print("Starting a conventional git commit...")
+        print(
+            Ansi.colour(
+                Ansi.fg.bright_red, "Tip: Press the up arrow key to recall history!"
+            )
+        )
+        commit_msg = add_type(commit_msg)
+        commit_msg = add_scope(commit_msg)
+        check_if_breaking_change()
+        commit_msg = add_description(commit_msg)
+        commit_msg = add_body(commit_msg)
+        commit_msg = add_footer(commit_msg)
+        print()
+
+    Ansi.print_ok("This is your commit message:")
     print()
     print(commit_msg)
     print()
@@ -416,8 +429,8 @@ def run():
 
     # Extra command line arguments for git commit
     argv_passthrough = []  # by default add no extra arguments
-    if len(sys.argv) > 1:
-        argv_passthrough = sys.argv[1:]  # overwrite default list
+    if len(args) > 1:
+        argv_passthrough = args[1:]  # overwrite default list
     existing_args = " ".join(argv_passthrough)
     text = Ansi.colour(Ansi.fg.bright_yellow, "Extra args for git commit: ")
     extra_args_str = prompt(ANSI(text), default=existing_args)
@@ -428,14 +441,14 @@ def run():
 
     # Ask for confirmation to commit
     confirmation_validator = YesNoValidator(answer_required=True)
-
     text = Ansi.b_yellow("Do you want to make your commit? [y/n] ")
     confirm = prompt(ANSI(text), validator=confirmation_validator).lower()
 
     if confirm in confirmation_validator.confirmations:
-        print()
+        commit_msg_history.store_string(commit_msg)
         cmds = ["git", "commit", "-m", commit_msg] + argv_passthrough
         returncode = subprocess.run(cmds).returncode
+        print()
         if returncode == 0:
             Ansi.print_ok("\nCommit has been made to conventional commits standards!")
         else:
@@ -449,6 +462,7 @@ def run():
 
 def main():
     try:
-        run()
+        # print(sys.argv)
+        run(sys.argv[1:])
     except KeyboardInterrupt:
         print("\nAborted.")
