@@ -367,7 +367,11 @@ def add_footer(commit_msg):
             # format each line with forced line breaks to maintain maximum line length
             f_lines[i] = "\n".join(
                 textwrap.wrap(
-                    line, width=72, break_long_words=False, subsequent_indent="  "
+                    line,
+                    width=72,
+                    break_long_words=False,
+                    break_on_hyphens=False,
+                    subsequent_indent="  ",
                 )
             )
 
