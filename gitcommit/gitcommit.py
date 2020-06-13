@@ -423,7 +423,7 @@ def run(args):
 
     commit_msg = ""
     if len(args) > 0 and args[0] == "retry":
-        args = args[1:]  # consume the first arg
+        args = args[1:]  # consume the "retry" first arg
         cm_histories_iter = commit_msg_history.load_history_strings()
         last_commit_msg = ""
         for last_commit_msg in cm_histories_iter:
@@ -452,16 +452,14 @@ def run(args):
 
     # print("\nNOTE: This was a dry run and no commit was made.\n")
 
-    # Extra command line arguments for git commit
-    argv_passthrough = []  # by default add no extra arguments
-    if len(args) > 1:
-        argv_passthrough = args[1:]  # overwrite default list
-    existing_args = " ".join(argv_passthrough)
+    # It is expected that all remaining args at this point are for the git
+    # commit command
+    args_string = " ".join(args)
     text = Ansi.colour(Ansi.fg.bright_yellow, "Extra args for git commit: ")
     extra_args_file_path = os.path.join(CONFIG_HOME_DIR, "extra_args_history")
     extra_args_str = prompt(
         ANSI(text),
-        default=existing_args,
+        default=args_string,
         history=FileHistory(extra_args_file_path),
         key_bindings=bindings,
     )
@@ -495,7 +493,7 @@ def run(args):
 
 def main():
     try:
-        # print(sys.argv)
+        print(sys.argv)
         run(sys.argv[1:])
     except KeyboardInterrupt:
         print("\nAborted.")
