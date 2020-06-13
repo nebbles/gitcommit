@@ -425,9 +425,9 @@ def run(args):
     if len(args) > 0 and args[0] == "retry":
         args = args[1:]  # consume the "retry" first arg
         cm_histories_iter = commit_msg_history.load_history_strings()
-        last_commit_msg = ""
-        for last_commit_msg in cm_histories_iter:
-            pass
+        last_commit_msg = next(cm_histories_iter, "")
+        if last_commit_msg == "":
+            Ansi.print_error("Could not find a previous commit message")
         commit_msg = last_commit_msg
 
     if commit_msg == "":
@@ -493,7 +493,7 @@ def run(args):
 
 def main():
     try:
-        print(sys.argv)
+        # print(sys.argv)
         run(sys.argv[1:])
     except KeyboardInterrupt:
         print("\nAborted.")
